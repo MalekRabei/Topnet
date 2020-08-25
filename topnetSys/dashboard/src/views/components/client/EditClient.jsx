@@ -147,12 +147,9 @@ class EditClient extends React.Component {
         clientState: response.payload.clientState,
         clientLogo: response.payload.clientLogo,
         clientCC: response.payload.clientCountryCode,
-        clientPIds: response.payload.clientProductIds.map((obj, index) => 
-        {return {
-          value : obj,
-          label : obj.title
-        }} ),
-        clientAds : response.payload.clientAds
+        
+        
+
       });
     });
 
@@ -198,44 +195,10 @@ class EditClient extends React.Component {
     }
     if (nextProps.client) {
       this.setState({
-        clientName: nextProps.client.clientName,
-        clientState: nextProps.client.clientState,
-        clientLogo: nextProps.client.clientLogo,
-        clientProductIds: nextProps.client.clientProductIds,
-        clientCountryCode: nextProps.client.clientCountryCode,
-        //clientAds : nextProps.client.clientAds,
+        client: nextProps.client
       });
     }
 
-    //assign product
-    if (nextProps.products) {
-      const mappedProductIds = nextProps.products.products.map((cp) => {
-        return {
-          value: cp,
-          label: cp.title,
-        };
-      });
-      let selectedDataProducts = mappedProductIds.filter((obj) =>
-        this.state.clientPIds.some((object) => object === obj.value)
-      );
-      this.setState({
-        clientProductIds: mappedProductIds,
-        clientProductIdsSelected:this.state.clientPIds,
-      });
-    }
-
-    //country codes
-    if (this.state.CountriesData) {
-      const mappedclientCountryCode = this.state.CountriesData.map(
-        (country) => {
-          return {
-            value: country.value,
-            label: country.label,
-          };
-        }
-      ); // ['TN','FR']
-      this.setState({ clientCountryCode: mappedclientCountryCode });
-    }
     //To receive user permission
     if (nextProps.permission) {
       console.log("permission ", nextProps.permission);
@@ -286,14 +249,39 @@ class EditClient extends React.Component {
       this.props.uploadImage(formData, path_to_upload);
     }
     const clientData = {
+      chargeCompte: this.state.chargeCompte,
+        profil: this.state.profil,        
+        active: this.state.active,        
+        raisonSociale: this.state.raisonSociale,
+        nombreSite:this.state.nombreSite,
+        multisite: this.state.multisite,
+        groupe:this.state.groupe,
+        dateDebut: this.state.dateDebut,
+        effectif:this.state.effectif,
+        secteurActivite: this.state.secteurActivite,
+        matriculeFiscale: this.state.matriculeFiscale,
+        tva: this.state.tva ,
+        timbre: this.state.timbre  ,  
+        logo:this.state.logo,
+        rue1: this.state.rue1 ,
+        rue2: this.state.rue2 ,
+        ville : this.state.ville,
+        gouvernerat: this.state.gouvernerat,
+        localite: this.state.localite,
+        delegation : this.state.delegation,
+        codePostal: this.state.codePostal,
+        tel : this.state.tel,
+        gsm: this.state.gsm,
+        fax: this.state.fax,
+        emailTopnet: this.state.emailTopnet,
+        email1: this.state.email1,
+        email2: this.state.email2,
+        email3: this.state.email3,
+        nomComplet: this.state.nomComplet,
       clientName: this.state.clientName,
       clientState: this.state.clientState,
       clientLogo: this.state.clientLogo,
       clientCountryCode: this.state.clientCountryCodeSelected.value,
-      clientProductIds: this.state.clientProductIdsSelected.map((product) => {
-        return product.value;
-      }),
-      clientAds : this.state.clientAds
     };
     this.props.editClient(this.state.id, clientData, this.props.history);
   }

@@ -138,7 +138,7 @@ var routes = [
   {
     path: "/manage-properties",
     name: "Properties",
-    icon: "ni ni-ui-04 text-black",
+    icon: "ni ni-ui-04 text-orange",
     component: ManageCategorie,
     layout: "/admin",
   },
