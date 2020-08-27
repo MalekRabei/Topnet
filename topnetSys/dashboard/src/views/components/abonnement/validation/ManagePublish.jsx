@@ -2,6 +2,8 @@ import React, { Component, Fragment } from "react";
 import classnames from "classnames";
 import Select from "react-select";
 import axios from "axios";
+import io from "socket.io-client";
+import { Link } from "react-router-dom";
 
 // reactstrap components
 import {
@@ -31,16 +33,54 @@ import {
 import SimpleHeader from "../../../../components/Headers/SimpleHeader";
 
 import { connect } from "react-redux";
+//TABLE
+import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
+import paginationFactory from "react-bootstrap-table2-paginator";
+import BootstrapTable from "react-bootstrap-table-next";
+// react plugin that prints a given react component
+import ReactToPrint from "react-to-print";
 
 
 import PendingPages from "./PendingPages";
 import CommitHistory from "./CommitHistory";
+import { dataTable } from "../../../../variables/general";
+
+
+const { SearchBar } = Search;
+const pagination = paginationFactory({
+  page: 1,
+  alwaysShowAllBtns: true,
+  showTotal: true,
+  withFirstAndLast: false,
+  sizePerPageRenderer: ({ options, currSizePerPage, onSizePerPageChange }) => (
+    <div className="dataTables_length" id="datatable-basic_length">
+      <label>
+        Show{" "}
+        {
+          <select
+            name="datatable-basic_length"
+            aria-controls="datatable-basic"
+            className="form-control form-control-sm"
+            onChange={(e) => onSizePerPageChange(e.target.value)}
+          >
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        }{" "}
+        entries.
+      </label>
+    </div>
+  ),
+});
 class ManagePublish extends React.Component {
   constructor(props) {
     super(props);
-
+    this.server = process.env.REACT_APP_API_URL || "";
+    this.socket = io.connect(this.server);
     this.state = {
-      pages: [],
+      abonnements: [],
       required_pages: [],
       permission : {},
       openedCollapses: ["collapseOne"],
@@ -60,15 +100,17 @@ class ManagePublish extends React.Component {
     }
   };
   onClick(id) {
-    this.props.addPendingPage(id);
+   // this.props.addPendingAbonnement(id);
         window.location.reload(false);
+
+  }
+  fetchAbonnement(){
 
   }
   
  
 
   render() {
-    console.log("PAGES", this.state.pages);
     return (
       <>
         <SimpleHeader name="Manage Publish" parentName="Publish" />
@@ -92,43 +134,102 @@ class ManagePublish extends React.Component {
                   <Row className="ml-2 mr-2">
                     
                         
-                          <Col lg="4" className="mt-3 " >
-                            <Card className="card-lift--hover shadow border-0">
-                              <CardImg
-                                alt="..."
-                                src={require("../../../../assets/img/theme/img-1-1000x600.jpg")}
-                                top
-                              />
-                              <CardBody className="text-center">
-                                <CardTitle>
-                                  <small className="text-muted font-weight-bold">
-                                    Client
-                                  </small>
-                                </CardTitle>
-
-                                <input
-                                  type="button"
-                                  className="btn btn-sm btn-info"
-                                  
-                                  value={
-                                  false=== true ?
-                                   "Valide"
-                                  : "Non Valide" }
-                                
-                                  disabled
-                                />
-                                {
-                                  false === false ?
-                                   <Button
-                                  className="btn btn-sm btn-danger"
-                                  onClick={(event) => {
-                                    this.onClick();
-                                  }}
-                                > Mettre en attente</Button> : null }
-
-                              </CardBody>
-                            </Card>
-                          </Col>
+                  <ToolkitProvider
+                  data={dataTable}
+                  keyField="name"
+                  columns={[
+                    {
+                      dataField: "name",
+                      text: "Name",
+                      sort: true
+                    },
+                    {
+                      dataField: "position",
+                      text: "Position",
+                      sort: true
+                    },
+                    
+                    {
+                      dataField: "start_date",
+                      text: "Start date",
+                      sort: true
+                    },
+                    {
+                      dataField: "salary",
+                      text: "Salary",
+                      sort: true
+                    },
+                    {
+                      dataField: "link",
+                      text: "ACTION",
+                      formatter: (rowContent, row) => {
+                        return (
+                          <div>
+                            {/* {this.state.permission.publish ||
+                        this.state.permission.edit ? ( */}
+                            <Button
+                              className="btn-round btn-icon"
+                              href="#pablo"
+                              id="tooltip443412080"
+                              //onClick={(e) => this.showUpdate(e, row)}
+                              size="sm"
+                              color="primary"
+                             // to={`/admin/update-client/${row._id}`}
+                              tag={Link}
+                            >
+                              <span className="btn-inner--icon mr-1">
+                                <i className="ni ni-settings-gear-65" />
+                              </span>
+                              <span className="btn-inner--text">Valider</span>
+                            </Button>
+                            <Button
+                              className="btn-round btn-icon"
+                              href="#pablo"
+                              id="tooltip443412080"
+                              //onClick={(e) => this.showUpdate(e, row)}
+                              size="sm"
+                              color="danger"
+                             // to={`/admin/assign-product/${row._id}`}
+                              tag={Link}
+                            >
+                              <span className="btn-inner--icon mr-1">
+                                <i className="ni ni-single-copy-04" />
+                              </span>
+                              <span className="btn-inner--text">Rejeter</span>
+                            </Button>
+                          
+                            {/* ) : null} */}
+                          </div>
+                        );
+                      },
+                    },                    
+                  ]}
+                  search
+                >
+                  {props => (
+                    <div className="py-4 table-responsive">
+                      <div
+                        id="datatable-basic_filter"
+                        className="dataTables_filter px-4 pb-1"
+                      >
+                        <label>
+                          Search:
+                          <SearchBar
+                            className="form-control-sm"
+                            placeholder=""
+                            {...props.searchProps}
+                          />
+                        </label>
+                      </div>
+                      <BootstrapTable
+                        {...props.baseProps}
+                        bootstrap4={true}
+                        pagination={pagination}
+                        bordered={false}
+                      />
+                    </div>
+                  )}
+                </ToolkitProvider>
                      
                   </Row>
                 </Collapse>

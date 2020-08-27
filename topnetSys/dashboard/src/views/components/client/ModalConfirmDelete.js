@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { Button, Modal } from "semantic-ui-react";
+import { Modal } from "semantic-ui-react";
 import axios from "axios";
+import { Button, Collapse, CardLink, Label } from "reactstrap";
 
 class ModalConfirmDelete extends Component {
   constructor(props) {
@@ -43,14 +44,20 @@ class ModalConfirmDelete extends Component {
     return (
       <Modal
         trigger={
-          <Button onClick={this.handleOpen} color={this.props.buttonColor}>
-            {this.props.buttonTriggerTitle}
+          <Button 
+          className={this.props.className}
+          onClick={this.handleOpen} 
+          href="#pablo"
+          id="tooltip443412080">
+            <span className="btn-inner--icon mr-1">
+                    <i className="fas fa-trash" />
+                  </span>
+                  <span className="btn-inner--text"> {this.props.buttonTriggerTitle}</span>
           </Button>
         }
         open={this.state.modalOpen}
         onClose={this.handleClose}
-        dimmer="inverted"
-        size="tiny"
+        
       >
         <Modal.Header>{this.props.headerTitle}</Modal.Header>
         <Modal.Content>

@@ -255,7 +255,7 @@ class ManageProperties extends React.Component {
             <Col>
               <Card>
                 <CardHeader>
-                  <h3 className="mb-0">Manage Properties</h3>
+                  <h3 className="mb-0">Proprietés</h3>
                 </CardHeader>
                 <CardBody>
                   {/*         ADD PROPERTY     */}
@@ -265,7 +265,7 @@ class ManageProperties extends React.Component {
                       htmlFor="example-text-input"
                       md="2"
                     >
-                      New Property Name
+                      Nouveau nom
                     </Label>
                     <Col md="7">
                       <InputGroup className={classnames("input-group-merge")}>
@@ -294,7 +294,7 @@ class ManageProperties extends React.Component {
                           type="submit"
                           onClick={this.onClickAdd.bind(this)}
                         >
-                          Add
+                          Ajouter
                         </Button>
                       </FormGroup>{" "}
                     </Col>
@@ -307,7 +307,7 @@ class ManageProperties extends React.Component {
                     columns={[
                       {
                         dataField: "property",
-                        text: "property",
+                        text: "Properieté",
                         sort: true,
                       },
 
@@ -330,7 +330,7 @@ class ManageProperties extends React.Component {
                                 <span className="btn-inner--icon mr-1">
                                   <i className="ni ni-settings-gear-65" />
                                 </span>
-                                <span className="btn-inner--text">Update</span>
+                                <span className="btn-inner--text">Modifier</span>
                               </Button>
                               <Button
                                 className="btn-round btn-icon"
@@ -343,7 +343,7 @@ class ManageProperties extends React.Component {
                                 <span className="btn-inner--icon mr-1">
                                   <i className="fas fa-trash" />
                                 </span>
-                                <span className="btn-inner--text">Delete</span>
+                                <span className="btn-inner--text">Supprimer</span>
                               </Button>
                               {/* ) : null} */}
                             </div>
@@ -360,7 +360,7 @@ class ManageProperties extends React.Component {
                           className="dataTables_filter px-4 pb-1"
                         >
                           <label>
-                            Search:
+                            Recherche:
                             <SearchBar
                               className="form-control-sm"
                               placeholder=""
@@ -386,7 +386,7 @@ class ManageProperties extends React.Component {
                   <CardHeader>
                     <Row className="align-items-center">
                       <Col xs="8">
-                        <h5 className="h3 mb-0">Updating Property</h5>{" "}
+                        <h5 className="h3 mb-0">Modifier Proprieté</h5>{" "}
                       </Col>
                       <Col className="text-right" xs="4">
                         <Button
@@ -394,7 +394,7 @@ class ManageProperties extends React.Component {
                           size="sm"
                           onClick={this.hideUpdate.bind(this)}
                         >
-                          close
+                          fermer
                         </Button>
                       </Col>
                     </Row>
@@ -409,7 +409,7 @@ class ManageProperties extends React.Component {
                                 href="#pablo"
                                 onClick={(e) => e.preventDefault()}
                               >
-                                Property Name
+                                Nom
                               </a>
                             </h4>
                             <InputGroup
@@ -442,7 +442,7 @@ class ManageProperties extends React.Component {
                               type="submit"
                               onClick={this.onClickUpdate.bind(this)}
                             >
-                              Update
+                              Modifier
                             </Button>
                           </div>
                         </Row>

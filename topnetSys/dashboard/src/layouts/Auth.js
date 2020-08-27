@@ -24,17 +24,30 @@ import { Container, Row, Col } from "reactstrap";
 import AuthNavbar from "../components/Navbars/AuthNavbar.js";
 import AuthFooter from "../components/Footers/AuthFooter.js";
 
-import routes from "../../src/routes.js";
+import getRoutesArray from "../../src/routes.js";
 
 class Auth extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      routes:[]
+    }
+  }
   componentDidMount() {
     document.body.classList.add("bg-default");
+  }
+  componentWillMount(){
+    let routes = getRoutesArray(localStorage);
+    this.setState({routes:routes});
   }
   componentWillUnmount() {
     document.body.classList.remove("bg-default");
   }
   getRoutes = routes => {
     return routes.map((prop, key) => {
+      if (prop.collapse) {
+        return this.getRoutes(prop.views);
+      }
       if (prop.layout === "/auth") {
         return (
           <Route
@@ -89,7 +102,7 @@ class Auth extends React.Component {
           <Container className="mt--8 pb-5">
             <Row className="justify-content-center">
               <Switch>
-                {this.getRoutes(routes)}
+                {this.getRoutes(this.state.routes)}
                 <Redirect from="*" to="/auth/login" />
               </Switch>
             </Row>

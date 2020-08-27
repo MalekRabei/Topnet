@@ -143,11 +143,42 @@ class EditClient extends React.Component {
   async componentWillMount() {
     await this.props.getClient(this.state.id).then((response) => {
       this.setState({
-        clientName: response.payload.clientName,
-        clientState: response.payload.clientState,
-        clientLogo: response.payload.clientLogo,
-        clientCC: response.payload.clientCountryCode,
-        
+        chargeCompte: response.payload.chargeCompte,
+        profil: response.payload.profil,
+        active: response.payload.active,
+        raisonSociale: response.payload.raisonSociale,
+        nombreSite: response.payload.nombreSite,
+        multisite: response.payload.multisite,
+        groupe: response.payload.groupe,
+        dateDebut: response.payload.dateDebut,
+        effectif: response.payload.effectif,
+
+        secteurActivite: response.payload.secteurActivite,
+        matriculeFiscale: response.payload.matriculeFiscale,
+        registreCommerce : response.payload.registreCommerce,
+        chiffreAffaire : response.payload.chiffreAffaire,
+        tva: response.payload.tva,
+        timbre: response.payload.timbre,
+        logo: response.payload.logo,
+
+         rue1: response.payload.rue1,
+         rue2: response.payload.rue2,
+         ville : response.payload.ville,
+         gouvernerat: response.payload.gouvernerat,
+         localite:response.payload.localite,
+         delegation : response.payload.delegation,
+         codePostal: response.payload.codePostal,
+         pays : response.payload.pays,
+         tel : response.payload.tel,
+         gsm: response.payload.gsm,
+         fax: response.payload.fax,
+         emailTopnet: response.payload.emailTopnet,
+         email1: response.payload.email1,
+         email2: response.payload.email2,
+         email3: response.payload.email3,
+         nomComplet: response.payload.nomComplet,
+         products: response.payload.products,
+         contact: response.payload.contact
         
 
       });
@@ -155,31 +186,86 @@ class EditClient extends React.Component {
 
     //get product from db
     //await this.props.getAllProducts();
-
-
-    //get country codes
-    const SelectDataForm = [];
-    const CountryData = [...CountriesData];
-    CountryData.map((country) => {
-      //country code and country name mapping to id: text:
-      return SelectDataForm.push({
-        value: country.code,
-        label: country.name + " (" + country.code + ")",
-      });
-    });
-    let selectedDataCountry = SelectDataForm.filter((obj) =>
-      this.state.clientCC.some((object) => object === obj.value)
-    );
-    this.setState({
-      CountriesData: SelectDataForm,
-      clientCountryCodeSelected: selectedDataCountry,
-    });
   }
  //user 
  SelectUserHandler= (selectedOptions)=> {
   const user = selectedOptions;
   this.setState({userSelected: user })
 }
+
+  //OnChange Select Country Handler
+  SelectFonctionInputHandler = (selectedOptions) => {
+    const fonction = selectedOptions;
+    this.setState({ profil: fonction.value });
+
+  };
+  //OnChange Select Country Handler
+  SelectMultisiteHandler = (selectedOptions) => {
+    const multi = selectedOptions;
+    this.setState({ multisite: multi.value });
+
+  };
+  //OnChange Select Country Handler
+  SelectGroupeHandler = (selectedOptions) => {
+    const groupe= selectedOptions;
+    this.setState({ groupe: groupe.value });
+
+  };
+  //OnChange Select Country Handler
+  SelectEffectifHandler = (selectedOptions) => {
+    const effectif = selectedOptions;
+    this.setState({ effectif: effectif.value });
+
+  };
+  //OnChange Select Country Handler
+  SelectTvaHandler = (selectedOptions) => {
+    const tva = selectedOptions;
+    this.setState({ tva: tva.value });
+
+  };
+
+  //OnChange Select Country Handler
+  SelectTimbreHandler = (selectedOptions) => {
+    const timbre = selectedOptions;
+    this.setState({ timbre: timbre.value });
+
+  };
+
+    //OnChange Select Country Handler
+    SelectgouvernoratHandler = (selectedOptions) => {
+      const gouvernorat = selectedOptions;
+      this.setState({ gouvernorat: gouvernorat.value });
+  
+    };
+      //OnChange Select Country Handler
+  SelectDelegationHandler = (selectedOptions) => {
+    const del = selectedOptions;
+    this.setState({ delegation: del.value });
+
+  };
+    //OnChange Select Country Handler
+    SelectLocaliteHandler = (selectedOptions) => {
+      const localite = selectedOptions;
+      this.setState({ localite: localite.value });
+  
+    };
+      //OnChange Select Country Handler
+  SelectCodePostalHandler = (selectedOptions) => {
+    const codePostal = selectedOptions;
+    this.setState({ codePostal: codePostal.value });
+
+  };
+
+  //user 
+  SelectUserHandler= (selectedOptions)=> {
+    const user = selectedOptions;
+    this.setState({userSelected: user })
+  }
+
+  //on Change select client state
+  SelectClientStateInputHandler = (e) => {
+    this.setState({ clientState: e.value });
+  };
 
   //OnChange 
    SelectInputHandler = (selectedOptions) => {
@@ -281,7 +367,7 @@ class EditClient extends React.Component {
       clientName: this.state.clientName,
       clientState: this.state.clientState,
       clientLogo: this.state.clientLogo,
-      clientCountryCode: this.state.clientCountryCodeSelected.value,
+       
     };
     this.props.editClient(this.state.id, clientData, this.props.history);
   }
@@ -291,11 +377,12 @@ class EditClient extends React.Component {
     return (
       <>
         <SimpleHeader name="Edit Client" parentName="Clients" />
-        <Container className="mt--6" fluid>
+        <Container className="mt--6" fluid 
+        >
         <Card>
               <CardHeader className="text-center">
                 <Col xs="2">
-                  <h3 className="mb-0">Modifier information client</h3>
+                  <h3 className="mb-0">Modifier Client</h3>
                 </Col>
                 <Col className="text-right" xs="4"></Col>
               </CardHeader>
@@ -372,11 +459,11 @@ class EditClient extends React.Component {
     
                               </label>
                           <Select
-                            name="chargeCompte"
+                            name="profil"
                             options={this.state.fonction}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler.bind(this)}
+                            onChange={this.SelectFonctionInputHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -437,7 +524,7 @@ class EditClient extends React.Component {
                             options={Options}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectMultisiteHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -485,7 +572,7 @@ class EditClient extends React.Component {
                             options={Options}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectGroupeHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -503,7 +590,7 @@ class EditClient extends React.Component {
                             options={EffectifOptions}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectEffectifHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -725,7 +812,7 @@ class EditClient extends React.Component {
                             options={Options}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectTvaHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -743,8 +830,40 @@ class EditClient extends React.Component {
                             options={Options}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectTimbreHandler.bind(this)}
                           />
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                    <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            Image
+                          </label>
+                          <ImageUpload
+                            ImageUpload={this.ImageUploadRecievedHandler}
+                          ></ImageUpload>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                    <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            Image
+                          </label>
+                          <ImageUpload
+                            ImageUpload={this.ImageUploadRecievedHandler}
+                          ></ImageUpload>
                         </FormGroup>
                       </Col>
                     </Row>
@@ -818,15 +937,15 @@ class EditClient extends React.Component {
                             className="form-control-label"
                             htmlFor="input-email"
                           >
-                            Gouvernerat
+                            gouvernorat
                           </label>
                           <Select
-                            defaultValue={Options[1]}
-                            name="gouvernerat"
-                            options={Options}
+                           isMulti
+                            name="gouvernorat"
+                            options={this.state.gouvernoratS}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectgouvernoratHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -839,12 +958,11 @@ class EditClient extends React.Component {
                             Délégation
                           </label>
                           <Select
-                            defaultValue={Options[1]}
                             name="delegation"
-                            options={Options}
+                            options={this.state.delegationS}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectDelegationHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -858,24 +976,17 @@ class EditClient extends React.Component {
                           >
                            Localité
                           </label>
-                          <InputGroup
-                            className={classnames("input-group-merge")}
-                          >
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="ni ni-single-02" />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <Input
-                              id="input-username"
-                              placeholder="Localité"
-                              type="text"
-                              name="localite"
-                              value={this.state.localite}
-                              onChange={this.onChange}
-                            />
-                          </InputGroup>
+                          
+                          <Select
+                           isMulti
+                            name="gouvernorat"
+                            options={this.state.localiteS}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            onChange={this.SelectLocaliteHandler.bind(this)}
+                          />
                         </FormGroup>
+                       
                       </Col>
                       <Col lg="6">
                         <FormGroup>
@@ -885,23 +996,14 @@ class EditClient extends React.Component {
                           >
                            Code postal
                           </label>
-                          <InputGroup
-                            className={classnames("input-group-merge")}
-                          >
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="ni ni-single-02" />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <Input
-                              id="input-username"
-                              placeholder="Code postal"
-                              type="text"
-                              name="codePostal"
-                              value={this.state.codePostal}
-                              onChange={this.onChange}
-                            />
-                          </InputGroup>
+                          <Select
+                           isMulti
+                            name="gouvernorat"
+                            options={this.state.codePostalS}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            onChange={this.SelectCodePostalHandler.bind(this)}
+                          />
                         </FormGroup>
                       </Col>
                     </Row>
@@ -939,7 +1041,7 @@ class EditClient extends React.Component {
                             className="form-control-label"
                             htmlFor="input-username"
                           >
-                           Pays/région
+                           Région
                           </label>
                           <InputGroup
                             className={classnames("input-group-merge")}
@@ -981,7 +1083,7 @@ class EditClient extends React.Component {
                             <Input
                               id="input-username"
                               placeholder="Tél"
-                              type="text"
+                              type="number"
                               name="tel"
                               value={this.state.tel}
                               onChange={this.onChange}
@@ -1008,7 +1110,7 @@ class EditClient extends React.Component {
                             <Input
                               id="input-username"
                               placeholder="Fax"
-                              type="text"
+                              type="number"
                               name="fax"
                               value={this.state.fax}
                               onChange={this.onChange}
@@ -1037,7 +1139,7 @@ class EditClient extends React.Component {
                             <Input
                               id="input-username"
                               placeholder="GSM"
-                              type="text"
+                              type="number"
                               name="gsm"
                               value={this.state.gsm}
                               onChange={this.onChange}

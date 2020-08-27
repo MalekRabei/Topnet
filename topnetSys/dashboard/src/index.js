@@ -25,6 +25,7 @@ import "./assets/scss/argon-dashboard-react.scss";
 
 import AdminLayout from "./layouts/Admin.js";
 import AuthLayout from "./layouts/Auth.js";
+import ErrorLayout from './layouts/Error'
 
 import { Provider } from "react-redux";
 import store from "./services/store";
@@ -71,14 +72,18 @@ ReactDOM.render(
   <Provider store={store}>
   <BrowserRouter>
     <Switch>
-      <Route path="/admin"
+  
+    <Route path="/admin"
        render={props => localStorage.jwtToken ? (
        <AdminLayout {...props} />) : (
         <Redirect to="/admin/index" />
       ) } 
       />
-      <Route path="/auth" render={props => <AuthLayout {...props} />} />
-      <Redirect to="/admin/index" />
+    <Route path="/auth" render={props => <AuthLayout  {...props} />} />
+    
+    <Redirect from="*" to="/auth/login" />
+
+    <Route path="/" render={props =><ErrorLayout {...props}/> } />
     </Switch>
   </BrowserRouter>
   </Provider>,

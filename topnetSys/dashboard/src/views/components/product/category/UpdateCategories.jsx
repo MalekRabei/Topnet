@@ -417,17 +417,17 @@ class UpdateCategories extends React.Component {
                 <CardHeader>
                   <Row className="align-items-center">
                     <Col xs="8">
-                      <h5 className="h3 mb-0"> Update Categories </h5>
+                      <h5 className="h3 mb-0"> Modifier Categories </h5>
                     </Col>
                    
                       <Col className="text-right" xs="4">
                         <Button
                           color="default"
                           size="sm"
-                          to="/admin/category/add"
+                          to="/admin/add-category"
                           tag={Link}
                         >
-                          Add New
+                          Ajouter
                         </Button>
                       </Col>
                    
@@ -472,7 +472,7 @@ class UpdateCategories extends React.Component {
                                             trigger="hover focus"
                                             target={`tooltip${category._id}`}
                                           >
-                                            Update Category
+                                            Modifier Categorie
                                           </UncontrolledTooltip>
                                           <i
                                             className="ni ni-settings-gear-65"
@@ -524,7 +524,7 @@ class UpdateCategories extends React.Component {
                                                 trigger="hover focus"
                                                 target={`tooltip${sub._id}`}
                                               >
-                                                Update Subategory
+                                                Modifier Sous-Categorie
                                               </UncontrolledTooltip>
                                             </div>
                                           </div>
@@ -552,11 +552,11 @@ class UpdateCategories extends React.Component {
                     <Row className="align-items-center">
                       <Col xs="8">
                         <h5 className="h3 mb-0">
-                          Updating{" "}
+                          Modification{" "}
                           {this.state.showCategoryUpdate ? (
-                            <>Category</>
+                            <>Categorie</>
                           ) : (
-                            <>Subategory</>
+                            <>Sous-Categorie</>
                           )}
                         </h5>{" "}
                       </Col>
@@ -566,7 +566,7 @@ class UpdateCategories extends React.Component {
                           size="sm"
                           onClick={this.closeUpdate.bind(this)}
                         >
-                          close
+                          fermer
                         </Button>
                       </Col>
                     </Row>
@@ -585,7 +585,7 @@ class UpdateCategories extends React.Component {
                                     href="#pablo"
                                     onClick={(e) => e.preventDefault()}
                                   >
-                                    Name
+                                    Nom
                                   </a>
                                 </h4>
                                 <InputGroup
@@ -681,7 +681,7 @@ class UpdateCategories extends React.Component {
                                     trigger="hover focus"
                                     target={`tooltip123`}
                                   >
-                                    Update
+                                    Modifier
                                   </UncontrolledTooltip>
 
                                   <Button
@@ -700,7 +700,7 @@ class UpdateCategories extends React.Component {
                                     trigger="hover focus"
                                     target={`tooltip1234`}
                                   >
-                                    Delete
+                                    Supprimer
                                   </UncontrolledTooltip>
                                 </div>
                               </Row>
@@ -721,7 +721,7 @@ class UpdateCategories extends React.Component {
                                     href="#pablo"
                                     onClick={(e) => e.preventDefault()}
                                   >
-                                    Subcategory
+                                    Sous-categorie
                                   </a>
                                 </h4>
                                 <InputGroup
@@ -807,7 +807,7 @@ class UpdateCategories extends React.Component {
                                     href="#pablo"
                                     onClick={(e) => e.preventDefault()}
                                   >
-                                    Properties
+                                    Properietés
                                   </a>
                                 </h4>
 
@@ -844,7 +844,7 @@ class UpdateCategories extends React.Component {
                                     trigger="hover focus"
                                     target={`tooltip12345`}
                                   >
-                                    Update
+                                    Modifier
                                   </UncontrolledTooltip>
                                   <Button
                                     className="btn-icon"
@@ -862,7 +862,7 @@ class UpdateCategories extends React.Component {
                                     trigger="hover focus"
                                     target={`tooltip123456`}
                                   >
-                                    Delete
+                                    Supprimer
                                   </UncontrolledTooltip>
                                 </div>
                               </Row>

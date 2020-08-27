@@ -251,7 +251,7 @@ class GlobalProducts extends React.Component {
         <Container className="mt--6" fluid>
             <Card>
               <CardHeader>
-                <h3 className="mb-0">Add Product</h3>
+                <h3 className="mb-0">Ajout Produit</h3>
               </CardHeader>
               <CardBody>
                 <Form
@@ -280,7 +280,7 @@ class GlobalProducts extends React.Component {
                       htmlFor="example-text-input"
                       md="2"
                     >
-                      Alt Picture
+                      Image Alt 
                     </Label>
                     <Col md="7">
                       <InputGroup className={classnames("input-group-merge")}>
@@ -290,7 +290,7 @@ class GlobalProducts extends React.Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input
-                          placeholder="Add alternative text to the picture"
+                          placeholder="ajouter un texte alternative à l'image"
                           name="alt_pic"
                           type="text"
                           value={this.state.alt_pic}
@@ -314,7 +314,7 @@ class GlobalProducts extends React.Component {
                       htmlFor="example-select"
                       md="2"
                     >
-                      Country Code
+                      Origine
                     </Label>
                     <Col md="7">
                       <Select
@@ -341,7 +341,7 @@ class GlobalProducts extends React.Component {
                       htmlFor="example-text-input"
                       md="2"
                     >
-                      Title
+                      Nom du produit
                     </Label>
                     <Col md="7">
                       <InputGroup className={classnames("input-group-merge")}>
@@ -351,7 +351,7 @@ class GlobalProducts extends React.Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input
-                          placeholder="Insert Product Title"
+                          placeholder="Inserer le nom du Produit "
                           name="title"
                           type="text"
                           invalid={!this.state.validation.title}
@@ -405,7 +405,7 @@ class GlobalProducts extends React.Component {
                           type="submit"
                           onClick={this.onClickAdd.bind(this)}
                         >
-                          Add
+                          Ajouter
                         </Button>
                       </Col>
                     </Col>
@@ -419,7 +419,7 @@ class GlobalProducts extends React.Component {
 
           <Card>
             <CardHeader>
-              <h3 className="mb-0">All Products</h3>
+              <h3 className="mb-0">Tous les Produits</h3>
             </CardHeader>
             <CardBody>
               <Table
@@ -429,11 +429,11 @@ class GlobalProducts extends React.Component {
               >
                 <thead className="thead-light">
                   <tr>
-                    <th>Coutry Code </th>
-                    <th>Title</th>
-                    <th>Picture</th>
-                    <th>Alt_picture</th>
-                    <th>Active</th>
+                    <th>Origine </th>
+                    <th>Nom</th>
+                    <th>Image</th>
+                    <th>Image_alt</th>
+                    <th>Etat</th>
 
                     
                       <th>Actions</th>
@@ -500,14 +500,14 @@ class GlobalProducts extends React.Component {
                               trigger="hover focus"
                               target={`tooltip${element._id}`}
                             >
-                              Delete
+                              Supprimer
                             </UncontrolledTooltip>
                             <UncontrolledTooltip
                               delay={0}
                               trigger="hover focus"
                               target={`tooltip1${element._id}`}
                             >
-                              update
+                              Modifier
                             </UncontrolledTooltip>
                             <Button
                               className="mr-4"

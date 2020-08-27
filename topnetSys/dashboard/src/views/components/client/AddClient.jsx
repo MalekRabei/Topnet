@@ -53,6 +53,7 @@ import { clearErrors } from "../../../services/errorServices/errorAction";
 import AdvancedAssignement from "./ProductsByCountry/AdvancedAssignement"
 import DisplayProducts from "./ProductsByCountry/DisplayProducts"
 import Fonction from "../../../utils/fonction.json"
+import Adresse from "../../../utils/adresse.json"
 
 const Options = [
   { value: true, label: "Oui" },
@@ -99,10 +100,14 @@ class AddClient extends React.Component {
       rue1: "" ,
       rue2: "" ,
       ville : "",
-      gouvernerat: "",
+      gouvernorat: "",
+      gouvernoratS:"",
       localite: "",
+      localiteS:"",
       delegation : "",
+      delegationS:"",
       codePostal: "",
+      codePostalS:"",
       tel : "",
       gsm: "",
       fax: "",
@@ -187,13 +192,58 @@ class AddClient extends React.Component {
       fonction: SelectDataForm ,
     });
     console.log(fonction);
+
+    const gouvernoratData = [];
+    const gouvernoratS = [...Adresse];
+    gouvernoratS.map((ad)=>{
+      return gouvernoratData.push({
+        value : ad.id,
+        label: ad.gouvernorat
+      })
+    })
+    this.setState({gouvernoratS: gouvernoratData })
+    console.log(gouvernoratS);
+
+
+    const LocaliteData = [];
+    const localiteS = [...Adresse];
+    localiteS.map((ad)=>{
+      return LocaliteData.push({
+        value : ad.id,
+        label: ad.localite
+      })
+    })
+    this.setState({localiteS: LocaliteData })
+    console.log(localiteS);
+
+    const delegationData = [];
+    const delegationS = [...Adresse];
+    delegationS.map((ad)=>{
+      return delegationData.push({
+        value : ad.id,
+        label: ad.delegation
+      })
+    })
+    this.setState({delegationS: delegationData })
+    console.log("del",delegationS);
+
+
+    const CodePostalData = [];
+    const codePostalS = [...Adresse];
+    codePostalS.map((ad)=>{
+      return CodePostalData.push({
+        value : ad.id,
+        label: ad.codePostal
+      })
+    })
+    this.setState({codePostalS: CodePostalData })
+    console.log(codePostalS);
   }
 
   //getting data from reducer
   componentWillReceiveProps(nextProps) {
     if (nextProps.clients) {
       this.setState({ client: nextProps.clients.client });
-      console.log(this.state.client)
     }
    
     //fonction
@@ -207,6 +257,55 @@ class AddClient extends React.Component {
         }
       );
       this.setState({ profil: mappedclientfonction });
+    }
+
+    //gouvernorat
+    if (this.state.gouvernoratS) {
+      const mappedGouv = this.state.gouvernoratS.map(
+        (ad) => {
+          return {
+            value: ad.value,
+            label: ad.label,
+          };
+        }
+      );
+      this.setState({ gouvernorat: mappedGouv });
+    }
+    //delegation
+    if (this.state.delegationS) {
+      const mappedDel = this.state.delegationS.map(
+        (ad) => {
+          return {
+            value: ad.value,
+            label: ad.label,
+          };
+        }
+      );
+      this.setState({ delegation: mappedDel });
+    }
+    ///localite
+    if (this.state.localiteS) {
+      const mappedLoc = this.state.localiteS.map(
+        (ad) => {
+          return {
+            value: ad.value,
+            label: ad.label,
+          };
+        }
+      );
+      this.setState({ localite: mappedLoc });
+    }
+    //code postal
+    if (this.state.codePostalS) {
+      const mappedCP = this.state.codePostalS.map(
+        (ad) => {
+          return {
+            value: ad.value,
+            label: ad.label,
+          };
+        }
+      );
+      this.setState({ codePostal: mappedCP });
     }
 
 
@@ -247,17 +346,73 @@ class AddClient extends React.Component {
   }
 
   
-  SelectInputHandler = (selectedOptions) => {
+  //OnChange Select Country Handler
+  SelectFonctionInputHandler = (selectedOptions) => {
     const fonction = selectedOptions;
     this.setState({ profil: fonction.value });
-    //set validation to true
-  //  this.state.validation["country_code"] = true;
+
+  };
+  //OnChange Select Country Handler
+  SelectMultisiteHandler = (selectedOptions) => {
+    const multi = selectedOptions;
+    this.setState({ multisite: multi.value });
+
+  };
+  //OnChange Select Country Handler
+  SelectGroupeHandler = (selectedOptions) => {
+    const groupe= selectedOptions;
+    this.setState({ groupe: groupe.value });
+
+  };
+  //OnChange Select Country Handler
+  SelectEffectifHandler = (selectedOptions) => {
+    const effectif = selectedOptions;
+    this.setState({ effectif: effectif.value });
+
+  };
+  //OnChange Select Country Handler
+  SelectTvaHandler = (selectedOptions) => {
+    const tva = selectedOptions;
+    this.setState({ tva: tva.value });
+
+  };
+
+  //OnChange Select Country Handler
+  SelectTimbreHandler = (selectedOptions) => {
+    const timbre = selectedOptions;
+    this.setState({ timbre: timbre.value });
+
+  };
+
+    //OnChange Select Country Handler
+    SelectgouvernoratHandler = (selectedOptions) => {
+      const gouvernorat = selectedOptions;
+      this.setState({ gouvernorat: gouvernorat.value });
+  
+    };
+      //OnChange Select Country Handler
+  SelectDelegationHandler = (selectedOptions) => {
+    const del = selectedOptions;
+    this.setState({ delegation: del.value });
+
+  };
+    //OnChange Select Country Handler
+    SelectLocaliteHandler = (selectedOptions) => {
+      const localite = selectedOptions;
+      this.setState({ localite: localite.value });
+  
+    };
+      //OnChange Select Country Handler
+  SelectCodePostalHandler = (selectedOptions) => {
+    const codePostal = selectedOptions;
+    this.setState({ codePostal: codePostal.value });
+
   };
 
   //user 
   SelectUserHandler= (selectedOptions)=> {
     const user = selectedOptions;
-    this.setState({userSelected: user })
+    this.setState({userSelected: user})
   }
 
   //on Change select client state
@@ -292,9 +447,9 @@ class AddClient extends React.Component {
 
     const clientData = {
         
-        chargeCompte: this.state.chargeCompte,
+        chargeCompte: this.state.userSelected,
         profil: this.state.profil,        
-        active: this.state.active,        
+        active: true,        
         raisonSociale: this.state.raisonSociale,
         nombreSite:this.state.nombreSite,
         multisite: this.state.multisite,
@@ -309,7 +464,7 @@ class AddClient extends React.Component {
         rue1: this.state.rue1 ,
         rue2: this.state.rue2 ,
         ville : this.state.ville,
-        gouvernerat: this.state.gouvernerat,
+        gouvernorat: this.state.gouvernorat,
         localite: this.state.localite,
         delegation : this.state.delegation,
         codePostal: this.state.codePostal,
@@ -507,7 +662,7 @@ console.log(this.state)
             <Card>
               <CardHeader className="text-center">
                 <Col xs="2">
-                  <h3 className="mb-0">Ajouter Client</h3>
+                  <h3 className="mb-0">Ajout Client</h3>
                 </Col>
                 <Col className="text-right" xs="4"></Col>
               </CardHeader>
@@ -584,11 +739,11 @@ console.log(this.state)
     
                               </label>
                           <Select
-                            name="chargeCompte"
+                            name="profil"
                             options={this.state.fonction}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler.bind(this)}
+                            onChange={this.SelectFonctionInputHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -649,7 +804,7 @@ console.log(this.state)
                             options={Options}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectMultisiteHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -697,7 +852,7 @@ console.log(this.state)
                             options={Options}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectGroupeHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -715,7 +870,7 @@ console.log(this.state)
                             options={EffectifOptions}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectEffectifHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -937,7 +1092,7 @@ console.log(this.state)
                             options={Options}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectTvaHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -955,8 +1110,40 @@ console.log(this.state)
                             options={Options}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectTimbreHandler.bind(this)}
                           />
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                    <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            Image
+                          </label>
+                          <ImageUpload
+                            ImageUpload={this.ImageUploadRecievedHandler}
+                          ></ImageUpload>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                    <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            Image
+                          </label>
+                          <ImageUpload
+                            ImageUpload={this.ImageUploadRecievedHandler}
+                          ></ImageUpload>
                         </FormGroup>
                       </Col>
                     </Row>
@@ -1030,15 +1217,15 @@ console.log(this.state)
                             className="form-control-label"
                             htmlFor="input-email"
                           >
-                            Gouvernerat
+                            gouvernorat
                           </label>
                           <Select
-                            defaultValue={Options[1]}
-                            name="gouvernerat"
-                            options={Options}
+                           isMulti
+                            name="gouvernorat"
+                            options={this.state.gouvernoratS}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectgouvernoratHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -1051,12 +1238,11 @@ console.log(this.state)
                             Délégation
                           </label>
                           <Select
-                            defaultValue={Options[1]}
                             name="delegation"
-                            options={Options}
+                            options={this.state.delegationS}
                             className="basic-multi-select"
                             classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
+                            onChange={this.SelectDelegationHandler.bind(this)}
                           />
                         </FormGroup>
                       </Col>
@@ -1070,24 +1256,17 @@ console.log(this.state)
                           >
                            Localité
                           </label>
-                          <InputGroup
-                            className={classnames("input-group-merge")}
-                          >
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="ni ni-single-02" />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <Input
-                              id="input-username"
-                              placeholder="Localité"
-                              type="text"
-                              name="localite"
-                              value={this.state.localite}
-                              onChange={this.onChange}
-                            />
-                          </InputGroup>
+                          
+                          <Select
+                           isMulti
+                            name="gouvernorat"
+                            options={this.state.localiteS}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            onChange={this.SelectLocaliteHandler.bind(this)}
+                          />
                         </FormGroup>
+                       
                       </Col>
                       <Col lg="6">
                         <FormGroup>
@@ -1097,23 +1276,14 @@ console.log(this.state)
                           >
                            Code postal
                           </label>
-                          <InputGroup
-                            className={classnames("input-group-merge")}
-                          >
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="ni ni-single-02" />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <Input
-                              id="input-username"
-                              placeholder="Code postal"
-                              type="text"
-                              name="codePostal"
-                              value={this.state.codePostal}
-                              onChange={this.onChange}
-                            />
-                          </InputGroup>
+                          <Select
+                           isMulti
+                            name="gouvernorat"
+                            options={this.state.codePostalS}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            onChange={this.SelectCodePostalHandler.bind(this)}
+                          />
                         </FormGroup>
                       </Col>
                     </Row>
@@ -1151,7 +1321,7 @@ console.log(this.state)
                             className="form-control-label"
                             htmlFor="input-username"
                           >
-                           Pays/région
+                           Région
                           </label>
                           <InputGroup
                             className={classnames("input-group-merge")}
@@ -1193,7 +1363,7 @@ console.log(this.state)
                             <Input
                               id="input-username"
                               placeholder="Tél"
-                              type="text"
+                              type="number"
                               name="tel"
                               value={this.state.tel}
                               onChange={this.onChange}
@@ -1220,7 +1390,7 @@ console.log(this.state)
                             <Input
                               id="input-username"
                               placeholder="Fax"
-                              type="text"
+                              type="number"
                               name="fax"
                               value={this.state.fax}
                               onChange={this.onChange}
@@ -1249,7 +1419,7 @@ console.log(this.state)
                             <Input
                               id="input-username"
                               placeholder="GSM"
-                              type="text"
+                              type="number"
                               name="gsm"
                               value={this.state.gsm}
                               onChange={this.onChange}

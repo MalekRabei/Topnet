@@ -329,15 +329,10 @@ class AddCategorie extends React.Component {
             <CardHeader>
               <Row className="align-items-center">
                 <Col xs="8">
-                  <h5 className="h3 mb-0"> Add Category</h5>
+                  <h5 className="h3 mb-0"> Ajout Categorie</h5>
                 </Col>
                 
-                  <Col className="text-right" xs="4">
-                    <h4 className="h4 mb-0 text-danger">
-                      {" "}
-                      Add Permission Denied
-                    </h4>
-                  </Col>
+                  
                
               </Row>
             </CardHeader>
@@ -349,7 +344,7 @@ class AddCategorie extends React.Component {
                     htmlFor="example-text-input"
                     md="2"
                   >
-                    New Categorie Name
+                    Nouveau nom
                   </Label>
                   <Col md="8">
                     <InputGroup className={classnames("input-group-merge")}>
@@ -416,7 +411,7 @@ class AddCategorie extends React.Component {
                     htmlFor="exampleFormControlSelect3"
                     md="2"
                   >
-                    Parent Categorie
+                    Categorie Parente
                   </Label>
                   <Col md="8">
                     <Select
@@ -445,7 +440,7 @@ class AddCategorie extends React.Component {
                         htmlFor="example-text-input"
                         md="2"
                       >
-                        Add Properties
+                        Ajout Properietés
                       </Label>
                       <Col md="8">
                         {this.state.properties.map((prop, index) => {
@@ -469,7 +464,7 @@ class AddCategorie extends React.Component {
                             { dataField: "", text: "", sort: true },
                             {
                               dataField: "value",
-                              text: "property",
+                              text: "Properieté",
                               sort: true,
                             },
 
@@ -507,7 +502,7 @@ class AddCategorie extends React.Component {
                                 className="dataTables_filter px-4 pb-1"
                               >
                                 <label>
-                                  Search:
+                                  Recherche:
                                   <SearchBar
                                     className="form-control-sm"
                                     placeholder=""
@@ -535,10 +530,10 @@ class AddCategorie extends React.Component {
                     <Button
                       className="my-0"
                       color="btn btn-outline-default"
-                      to="/admin/category/update"
+                      to="/admin/update-category"
                       tag={Link}
                     >
-                      Back To Categories
+                      Retour
                     </Button>
 
                     
@@ -547,7 +542,7 @@ class AddCategorie extends React.Component {
                         color="btn btn-outline-primary"
                         onClick={this.onClickSubmit.bind(this)}
                       >
-                        Add
+                        Ajouter
                       </Button>
                     
                   </Col>

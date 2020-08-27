@@ -56,7 +56,19 @@ class AdminNavbar extends React.Component {
       avatar: "",
       redirect: null,
       permissiontitle: "",
+      search:"",
     };
+    this.onChange = this.onChange.bind(this);
+
+  }
+
+  onChange(e) {
+    this.setState({ [e.target.name]: e.target.value });
+  }
+ 
+  searchUpdate = (e)=>{
+    let keyword = e.target.value;
+    this.setState({search: keyword})
   }
   
   componentWillReceiveProps(nextProps) {
@@ -104,7 +116,7 @@ class AdminNavbar extends React.Component {
                       <i className="fas fa-search" />
                     </InputGroupText>
                   </InputGroupAddon>
-                  <Input placeholder="Search" type="text" />
+                  <Input placeholder="Search" type="text" name="search" />
                 </InputGroup>
               </FormGroup>
             </Form>

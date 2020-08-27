@@ -24,17 +24,63 @@ import AdminNavbar from "../components/Navbars/AdminNavbar.js";
 import AdminFooter from "../components/Footers/AdminFooter.js";
 import Sidebar from "../components/Sidebar/Sidebar.js";
 
-import routes from "../../src/routes.js";
+import getRoutesArray from "../../src/routes.js";
+import { connect } from "react-redux";
 
 class Admin extends React.Component {
+
+  state = {
+    sidenavOpen: true,
+    routes: [],
+    currentsite: {},
+    auth: {},
+    permission: {},
+  };
   componentDidUpdate(e) {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.mainContent.scrollTop = 0;
   }
-  getRoutes = routes => {
+ 
+  getBrandText = path => {
+    for (let i = 0; i < this.state.routes.length; i++) {
+      if (
+        this.props.location.pathname.indexOf(
+          this.state.routes[i].layout + this.state.routes[i].path
+        ) !== -1
+      ) {
+        return this.state.routes[i].name;
+      }
+    }
+    return "Brand";
+  };
+  componentWillMount() {
+    let routes = getRoutesArray(localStorage);
+    this.setState({ routes: routes});
+  }
+  componentWillReceiveProps(NextProps) {
+   
+    if (
+      NextProps.auth !== undefined
+    ) {
+     
+      this.setState({  auth: NextProps.auth },
+        async () => {
+          if (JSON.stringify(this.state.auth) !== "{}") {
+          }
+        }
+      );
+    }
+  }
+  getRoutes = (routes) => {
     return routes.map((prop, key) => {
+      if (prop.collapse) {
+        return this.getRoutes(prop.views);
+      }
       if (prop.layout === "/admin") {
+        if(prop.path==="/add-user"){
+          return null;
+        }
         return (
           <Route
             path={prop.layout + prop.path}
@@ -47,24 +93,13 @@ class Admin extends React.Component {
       }
     });
   };
-  getBrandText = path => {
-    for (let i = 0; i < routes.length; i++) {
-      if (
-        this.props.location.pathname.indexOf(
-          routes[i].layout + routes[i].path
-        ) !== -1
-      ) {
-        return routes[i].name;
-      }
-    }
-    return "Brand";
-  };
   render() {
+    console.log(this.state)
     return (
       <>
         <Sidebar
           {...this.props}
-          routes={routes}
+          routes={this.state.routes}
           logo={{
             innerLink: "/admin/index",
             imgSrc: require("../assets/img/brand/logo.png"),
@@ -77,7 +112,7 @@ class Admin extends React.Component {
             brandText={this.getBrandText(this.props.location.pathname)}
           />
           <Switch>
-            {this.getRoutes(routes)}
+            {this.getRoutes(this.state.routes)}
             <Redirect from="*" to="/admin/index" />
           </Switch>
           <Container fluid>
@@ -89,4 +124,10 @@ class Admin extends React.Component {
   }
 }
 
-export default Admin;
+// Connect the redux store
+export default connect(
+  (state) => ({
+    auth: state.auth.userconnected,
+  }),
+  {}
+)(Admin);

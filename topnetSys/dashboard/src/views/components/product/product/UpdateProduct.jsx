@@ -111,7 +111,7 @@ class UpdateProduct extends React.Component {
     }
     //product added => get success message
     if (nextProps.products.message) {
-      if (nextProps.products.message !== "") {
+      if (nextProps.products.message !==  "") {
         // success notification
         this.refs.notify.notificationAlert(
           NotificationAlertOptions(
@@ -186,7 +186,7 @@ class UpdateProduct extends React.Component {
         <Container className="mt--6" fluid>
           <Card>
             <CardHeader>
-              <h3 className="mb-0">Update Product </h3>
+              <h3 className="mb-0">Modifier Produit </h3>
             </CardHeader>
             <CardBody>
               <Form role="form" onSubmit={this.onSubmit}>
@@ -205,7 +205,7 @@ class UpdateProduct extends React.Component {
                     htmlFor="example-text-input"
                     md="2"
                   >
-                    Alt Picture
+                    Image Alt 
                   </Label>
                   <Col md="7">
                     <InputGroup className={classnames("input-group-merge")}>
@@ -215,7 +215,7 @@ class UpdateProduct extends React.Component {
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input
-                        placeholder="Add alternative text to the picture"
+                        placeholder="Ajoute un texte alternative à l'image"
                         name="alt_pic"
                         type="text"
                         value={this.state.alt_pic}
@@ -239,7 +239,7 @@ class UpdateProduct extends React.Component {
                     htmlFor="example-select"
                     md="2"
                   >
-                    Country Code
+                    Origine
                   </Label>
                   <Col md="7">
                     <Select
@@ -269,7 +269,7 @@ class UpdateProduct extends React.Component {
                     htmlFor="example-text-input"
                     md="2"
                   >
-                    Title
+                    Nom du produit
                   </Label>
                   <Col md="7">
                     <InputGroup className={classnames("input-group-merge")}>
@@ -279,7 +279,7 @@ class UpdateProduct extends React.Component {
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input
-                        placeholder="Insert Product Title"
+                        placeholder="Inserer le nom du Produit"
                         name="title"
                         type="text"
                         value={this.state.title}
@@ -334,7 +334,7 @@ class UpdateProduct extends React.Component {
                         to="/admin/globalproducts"
                         tag={Link}
                       >
-                        Back To Products
+                        Retour
                       </Button>
                       <Button
                         className="my-4"
@@ -342,7 +342,7 @@ class UpdateProduct extends React.Component {
                         type="submit"
                         onClick={this.onClickUpdate.bind(this)}
                       >
-                        Update
+                        Modifier
                       </Button>
                     </Col>
                   </Col>
