@@ -1,14 +1,18 @@
 import React, { Component } from "react";
-import { Table, Image, Pagination } from "semantic-ui-react";
+import { Table, Image,Pagination } from "semantic-ui-react";
 import { connect } from "react-redux";
 import ModalUser from "./ModalUser";
 import ModalConfirmDelete from "./ModalConfirmDelete";
+import ShowImageModal from './ShowImageModal';
 import ModalPermission from "./ModalPermission";
 import EditPermission from "./EditPermission";
 import { Link } from "react-router-dom";
 import { Col, Label, Row } from "reactstrap";
 import { changeStatus } from "../../../services/userServices/authActions";
+import { ImageGroup } from 'react-fullscreen-image'
+
 const color = "blue";
+
 
 class TableUser extends Component {
   constructor(props) {
@@ -44,6 +48,9 @@ class TableUser extends Component {
 this.setState({users:users});
 
   }
+  onClickImage(){
+
+  }
 
   render() {
     console.log("users", this.state.users);
@@ -52,6 +59,7 @@ this.setState({users:users});
         <Table.Row key={user._id}>
           <Table.Cell>
             <Image
+            
               src={process.env.PUBLIC_URL + "/Images/" + user.avatar}
               size="tiny"
               circular
@@ -122,6 +130,14 @@ this.setState({users:users});
                 buttonColor="red"
                 user={user}
                 onUserDeleted={this.props.onUserDeleted}
+                server={this.props.server}
+                socket={this.props.socket}
+              />
+               <ShowImageModal
+                headerTitle="Show Image"
+                buttonTriggerTitle="Show"
+                buttonColor="pink"
+                user={user}
                 server={this.props.server}
                 socket={this.props.socket}
               />

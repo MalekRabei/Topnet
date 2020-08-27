@@ -4,6 +4,7 @@ import Select from "react-select";
 import axios from "axios";
 import io from "socket.io-client";
 import { Link } from "react-router-dom";
+import ShowImageModal from './ShowImageModal'
 
 // reactstrap components
 import {
@@ -39,11 +40,6 @@ import paginationFactory from "react-bootstrap-table2-paginator";
 import BootstrapTable from "react-bootstrap-table-next";
 // react plugin that prints a given react component
 import ReactToPrint from "react-to-print";
-
-
-import PendingPages from "./PendingPages";
-import CommitHistory from "./CommitHistory";
-import { dataTable } from "../../../../variables/general";
 
 
 const { SearchBar } = Search;
@@ -86,6 +82,7 @@ class ManagePublish extends React.Component {
       openedCollapses: ["collapseOne"],
       openedCollapses: ["collapseTwo"],
     };
+    this.fetchAbonnement= this.fetchAbonnement.bind(this);
   }
   collapsesToggle = (collapse) => {
     let openedCollapses = this.state.openedCollapses;
@@ -99,24 +96,36 @@ class ManagePublish extends React.Component {
       });
     }
   };
+  componentDidMount() {
+    this._isMounted = true;
+    this.fetchAbonnement();
+  }
   onClick(id) {
    // this.props.addPendingAbonnement(id);
         window.location.reload(false);
 
   }
   fetchAbonnement(){
-
+    axios
+    .get(`${this.server}/api/abonnements/list`)
+    .then((response) => {
+      this.setState({ abonnements: response.data });
+    })
+    .catch((err) => {
+      console.log(err.response);
+    });
   }
   
  
 
   render() {
+    console.log(this.state.abonnements)
     return (
       <>
         <SimpleHeader name="Manage Publish" parentName="Publish" />
         <Container className="mt--6" fluid>
           <Row>
-            <Col lg="8">
+            <Col lg="12">
               <Card>
                 <CardHeader
                   role="tab"
@@ -135,28 +144,28 @@ class ManagePublish extends React.Component {
                     
                         
                   <ToolkitProvider
-                  data={dataTable}
+                  data={this.state.abonnements}
                   keyField="name"
                   columns={[
                     {
-                      dataField: "name",
-                      text: "Name",
+                      dataField: "debit",
+                      text: "Debit",
                       sort: true
                     },
                     {
-                      dataField: "position",
-                      text: "Position",
+                      dataField: "telADSL",
+                      text: "Téléphone",
                       sort: true
                     },
                     
                     {
-                      dataField: "start_date",
-                      text: "Start date",
+                      dataField: "etat ",
+                      text: "Etat ",
                       sort: true
                     },
                     {
-                      dataField: "salary",
-                      text: "Salary",
+                      dataField: "fichier1recto",
+                      text: "Contract",
                       sort: true
                     },
                     {
@@ -197,6 +206,15 @@ class ManagePublish extends React.Component {
                               </span>
                               <span className="btn-inner--text">Rejeter</span>
                             </Button>
+                            <ShowImageModal
+                           className="btn btn-sm btn-danger btn-round btn-icon"
+                          headerTitle="Afficher"
+                          buttonTriggerTitle="Contrat"
+                          buttonColor="pink"
+                          abonnement={row}
+                          server={this.props.server}
+                          socket={this.props.socket}
+                        />
                           
                             {/* ) : null} */}
                           </div>
@@ -235,27 +253,7 @@ class ManagePublish extends React.Component {
                 </Collapse>
               </Card>
             </Col>
-            <Col lg="4">
-              <Card className="card-plain">
-                <CardHeader
-                  role="tab"
-                  onClick={() => this.collapsesToggle("collapseOne")}
-                  aria-expanded={this.state.openedCollapses.includes(
-                    "collapseOne"
-                  )}
-                >
-                  <h3 className="mb-0">Historique</h3>
-                </CardHeader>
-                <Collapse
-                  role="tabpanel"
-                  isOpen={this.state.openedCollapses.includes("collapseOne")}
-                >
-                  <CommitHistory></CommitHistory>
-                </Collapse>
-              </Card>
-            </Col>
-
-            <PendingPages></PendingPages>
+           
           </Row>
         </Container>
       </>

@@ -7,7 +7,20 @@ const { validationResult , check} = require("express-validator");
 
 const Abonnement = require("../../models/abonnement");
 
-
+// @route   POST api/abonnement/list
+// @desc    get all abonnements
+// @access  Private
+router.get("/list", (req, res) => {
+    Abonnement.find({})
+      .then((result) => {
+        res.json(result);
+      })
+      .catch((err) => {
+        res
+          .status(404)
+          .json({ success: false, msg: `Something went wrong. ${err}` });
+      });
+  });
 router.post(
     "/abonnement/add", async(req, res, next) => {
    // if (req.body.clientId && req.body.productId) {

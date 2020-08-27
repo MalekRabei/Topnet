@@ -72,6 +72,14 @@ export const routes_admin = [
     layout: "/error",
     invisible: true
   },
+  {
+    path: "/icons",
+    name: "Icons",
+    icon: "ni ni-tv-2 text-primary",
+    component: Icons,
+    layout: "/admin",
+    invisible:true
+  },
   //users
   {
     collapse: true,
@@ -136,11 +144,16 @@ export const routes_admin = [
     collapse:true,
     path: "/abonnement",
     name: "Abonnements",
-    icon: "ni ni-single-copy-04 text-purple",
+    icon: "ni ni-single-copy-04 text-info",
     component: Abonnement,
     layout: "/admin",
     state: "AbonnementCollapse",
     views:[
+      {path: "/abonnement",
+      name: "Abonnements",
+      icon: "ni ni-single-copy-04 text-purple",
+      component: Abonnement,
+      layout: "/admin",},
       {
         path:"/valider-abonnement",
         name:"Valider Abonnements",
