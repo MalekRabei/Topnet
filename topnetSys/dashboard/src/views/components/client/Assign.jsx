@@ -86,6 +86,57 @@ class Assign extends React.Component {
       clientPIds: [],
       clientAdss: [],
       clients: [],
+      users:[],
+      user:[],
+      userSelected:[],
+
+      chargeCompte: {},
+      profil: "",        
+      active: false,        
+      raisonSociale: "",
+
+      nombreSite: "",
+      multisite: false,
+      groupe: false,
+      dateDebut: "",
+      effectif: "",
+      secteurActivite: "",
+      matriculeFiscale: "",
+      tva: false ,
+      timbre: false  ,  
+
+      logo: "",
+      rue1: "" ,
+      rue2: "" ,
+      ville : "",
+      gouvernerat: "",
+      localite: "",
+      delegation : "",
+      codePostal: "",
+      tel : "",
+      gsm: "",
+      fax: "",
+      emailTopnet: "",
+      email1: "",
+      email2: "",
+      email3: "",
+      lattidue : "",
+      nomComplet: "",
+      products: [],
+      productIdsSelected: [],
+      fonction:"",
+     
+      image: {},
+      errors: {},
+      permission: {},
+      showProducts: false ,
+      show : true,
+      search : false,
+      searchInput: "",
+      hide : false,
+      selectedOption: false,
+      result: false,
+      client: {},
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -109,13 +160,43 @@ class Assign extends React.Component {
   componentDidMount() {
     this.props.getClient(this.state.id).then((response) =>
       this.setState({
-        clientName: response.payload.clientName,
-        clientState: response.payload.clientState,
-        clientLogo: response.payload.clientLogo,
-        clientCountryCode: response.payload.clientCountryCode,
-        clientProductIds: response.payload.clientProductIds,
+        chargeCompte: response.payload.chargeCompte,
+        profil: response.payload.profil,
+        active: response.payload.active,
+        raisonSociale: response.payload.raisonSociale,
+        nombreSite: response.payload.nombreSite,
+        multisite: response.payload.multisite,
+        groupe: response.payload.groupe,
+        dateDebut: response.payload.dateDebut,
+        effectif: response.payload.effectif,
+
+        secteurActivite: response.payload.secteurActivite,
+        matriculeFiscale: response.payload.matriculeFiscale,
+        registreCommerce : response.payload.registreCommerce,
+        chiffreAffaire : response.payload.chiffreAffaire,
+        tva: response.payload.tva,
+        timbre: response.payload.timbre,
+        logo: response.payload.logo,
+
+         rue1: response.payload.rue1,
+         rue2: response.payload.rue2,
+         ville : response.payload.ville,
+         gouvernerat: response.payload.gouvernerat,
+         localite:response.payload.localite,
+         delegation : response.payload.delegation,
+         codePostal: response.payload.codePostal,
+         pays : response.payload.pays,
+         tel : response.payload.tel,
+         gsm: response.payload.gsm,
+         fax: response.payload.fax,
+         emailTopnet: response.payload.emailTopnet,
+         email1: response.payload.email1,
+         email2: response.payload.email2,
+         email3: response.payload.email3,
+         nomComplet: response.payload.nomComplet,
+         contact: response.payload.contact,
         
-        clientPIds: response.payload.clientProductIds.map((obj, index) => 
+        clientPIds: response.payload.products.map((obj, index) => 
         {return {
           value : obj,
           label : obj.title
@@ -150,11 +231,8 @@ class Assign extends React.Component {
       // console.log( nextProps.client.client);
 
       this.setState({
-        clientName: client.clientName,
-        clientState: client.clientState,
-        clientLogo: client.clientLogo,
-        clientCountryCode: client.clientCountryCode,
-        clientProductIds: client.clientProductIds,
+        
+        products: client.products,
       });
     }
     //assign product
@@ -177,7 +255,7 @@ class Assign extends React.Component {
       );
 
       this.setState({
-        clientProductIds: mappedProductIds,
+        products: mappedProductIds,
         clientProductIdsSelected:this.state.clientPIds ,
       });
     }
@@ -185,7 +263,7 @@ class Assign extends React.Component {
    
   }
   SelectClientStateInputHandler = (e) => {
-    this.setState({ clientState: e.value });
+    this.setState({ active: e.value });
   };
 
   onChange(e) {
@@ -193,6 +271,7 @@ class Assign extends React.Component {
   }
   //on Change select product
   SelectProductInputHandler = (selectedOptions) => {
+    console.log("select  product inp handler")
     const clientProductIds = selectedOptions;
     this.setState({ clientProductIdsSelected: clientProductIds });
   };
@@ -200,11 +279,43 @@ class Assign extends React.Component {
 
   onSubmit(e) {
     e.preventDefault();
+
     const clientData = {
-      clientName: this.state.clientName,
-      clientState: this.state.clientState,
-      clientLogo: this.state.clientLogo,
-      clientCountryCode: this.state.clientCountryCode,
+      chargeCompte: this.state.chargeCompte,
+        profil: this.state.profil,        
+        active: this.state.active,        
+        raisonSociale: this.state.raisonSociale,
+        nombreSite:this.state.nombreSite,
+        multisite: this.state.multisite,
+        groupe:this.state.groupe,
+        dateDebut: this.state.dateDebut,
+        effectif:this.state.effectif,
+        secteurActivite: this.state.secteurActivite,
+        matriculeFiscale: this.state.matriculeFiscale,
+        tva: this.state.tva ,
+        timbre: this.state.timbre  ,  
+        logo:this.state.logo,
+        rue1: this.state.rue1 ,
+        rue2: this.state.rue2 ,
+        ville : this.state.ville,
+        gouvernerat: this.state.gouvernerat,
+        localite: this.state.localite,
+        delegation : this.state.delegation,
+        codePostal: this.state.codePostal,
+        tel : this.state.tel,
+        gsm: this.state.gsm,
+        fax: this.state.fax,
+        emailTopnet: this.state.emailTopnet,
+        email1: this.state.email1,
+        email2: this.state.email2,
+        email3: this.state.email3,
+        nomComplet: this.state.nomComplet,
+    products: this.state.clientProductIdsSelected.map((product) => {
+      return product.value;
+    }),
+    clientName: this.state.clientName,
+    clientState: this.state.clientState,
+    clientLogo: this.state.clientLogo,
       
     };
     this.props.editClient(this.state.id, clientData, this.props.history);
@@ -247,7 +358,7 @@ class Assign extends React.Component {
                                 className="form-control-label"
                                 htmlFor="input-username"
                               >
-                                Client Name
+                                Nom entreprise
                               </label>
                               <InputGroup
                                 className={classnames("input-group-merge")}
@@ -261,8 +372,8 @@ class Assign extends React.Component {
                                   id="input-username"
                                   placeholder="Enter Client Name"
                                   type="text"
-                                  name="clientName"
-                                  value={this.state.clientName}
+                                  name="nomComplet"
+                                  value={this.state.nomComplet}
                                   disabled
                                 />
                               </InputGroup>
@@ -278,7 +389,7 @@ class Assign extends React.Component {
                               </label>
                               <Select
                                 defaultValue={stateOptions[1]}
-                                name="clientState"
+                                name="active"
                                 className="basic-multi-select"
                                 classNamePrefix="select"
                                 isDisabled={true}
@@ -306,7 +417,7 @@ class Assign extends React.Component {
                                 isMulti
                                 value= {this.state.clientProductIdsSelected}
                                 name="clientProductIds"
-                                options={this.state.clientProductIds}
+                                options={this.state.products}
                                 className="basic-multi-select"
                                 classNamePrefix="select"
                                 onChange={this.SelectProductInputHandler.bind(

@@ -17,6 +17,8 @@ const categories = require('./routes/api/categoryApi');
 const productPropertiesApi = require('./routes/api/productPropertiesApi');
 const property = require("./routes/api/propertyApi");
 const clients = require('./routes/api/clientApi');
+const abonnement = require('./routes/api/abonnementApi');
+
 
 
 
@@ -52,8 +54,10 @@ app.use('/api/product', products);
 app.use('/api/category', categories);
 app.use('/api/productproperties', productPropertiesApi);
 app.use("/api/property", property);
+app.use("/api/abonnements", abonnement);
 
 
+app.use(express.urlencoded({ extended: true }));
 const server = app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
