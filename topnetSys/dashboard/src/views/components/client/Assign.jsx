@@ -310,6 +310,7 @@ class Assign extends React.Component {
   }
   //on Change select product
   SelectProductInputHandler = (selectedOptions) => {
+    console.log("select  product inp handler")
     const clientProductIds = selectedOptions;
     this.setState({ clientProductIdsSelected: clientProductIds });
   };

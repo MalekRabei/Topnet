@@ -9,38 +9,38 @@ import {
     createClient,
     editClient,
   } from "../../../services/clientServices/clientActions";
+  import {
+    createAbonnement,
+    
+  } from "../../../services/abonnementServices/abonnementActions";
 import { getAllProducts , getProductById} from "../../../services/productServices/productActions";
 import classnames from "classnames";
 import { Link, withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
 import DataProducts from "../../../Data/DataProducts.js";
 import Select from "react-select";
+import Fonction from "../../../utils/fonction.json"
+import ImageUpload from "../user/adding-user/ImageUpload";
+import Adresse from "../../../utils/adresse.json"
 
 //notifications imports
-import NotificationAlert from "react-notification-alert";
 import NotificationAlertOptions from "../../../layouts/Alerts";
 
 import { uploadImage } from "../../../services/ImageServices/ImageActions";
-import ImageUpload from "../user/adding-user/ImageUpload";
 // reactstrap components
 import {
   Button,
   Card,
   CardHeader,
   CardBody,
-  CardImg,
-  CardTitle,
+  
   FormGroup,
   Form,
   Input,
-  ListGroupItem,
-  ListGroup,
-  Progress,
   Container,
   Row,
   Col,
   Collapse,
-
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -48,12 +48,9 @@ import {
 } from "reactstrap";
 // core components
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import CountriesData from "../../../utils/CountryData/CountriesData.json";
 
 import { clearErrors } from "../../../services/errorServices/errorAction";
 import AdvancedAssignement from "./ProductsByCountry/AdvancedAssignement"
-import DisplayProducts from "./ProductsByCountry/DisplayProducts"
-import AddClient from './../client/AddClient'
 const segOptions = [
     { value: "cooperating", label: "cooperating" },
     { value: "not cooperating", label: "not cooperating" },
@@ -66,23 +63,61 @@ const segOptions = [
     { value: "cooperating", label: "cooperating" },
     { value: "not cooperating", label: "not cooperating" },
   ];
+  
   const Options = [
-    { value: "Oui", label: "Non" },
-    { value: "Oui", label: "Non" },
+    { value: true, label: "Oui" },
+    { value: false, label: "Non" },
+  ];
+
+   
+  const OptionsDebit = [
+    { value: 4, label: "4 Méga" },
+    { value: 8, label: "8 Méga" },
+    { value: 10, label: "10 Méga" },
+    { value: 12, label: "12 Méga" },
+    { value: 20, label: "20 Méga" },
+  ];
+
+  const OptionsPaiement = [
+    { value: "Mensuelle", label: "Mensuelle " },
+    { value: "Trimestrielle", label: "Trimestrielle" },
+    { value: "Semestrielle", label: "Semestrielle" },
+    { value: "Annuelle", label: "Annuelle" },
+    
+  ];
+  
+  const EffectifOptions = [
+    { value: "10", label: "10" },
+    { value: "10/100", label: "entre 10 et 100" },
+    { value: "> 100", label: "> 100" },
+  
   ];
      class Abonnement extends React.Component {
         prodTitle = DataProducts.map((prod) => prod._id);
 
        constructor(props) {
-       
         super(props);
         this.server = process.env.REACT_APP_API_URL || "";
         this.socket = io.connect(this.server);
         this.state = {
-          startDate:{},
-          endDate:{},
-          fichier1:"",
-          fichier2:"",
+         
+          fichier1recto:"",
+          fichier1verso:"",
+          fichier2recto:"",
+          fichier2verso:"",
+          fichier3recto:"",
+          fichier3verso:"",
+
+          fichier1rectoimg:{},
+          fichier1versoimg:{},
+          fichier2rectoimg:{},
+          fichier2versoimg:{},
+          fichier3rectoimg:{},
+          fichier3versoimg:{},
+          debit:"",
+          telADSL:"",
+          modePaiement:"",
+          active:{},
           /**     forfait */
 
 
@@ -98,378 +133,408 @@ const segOptions = [
             errors: {},
             clientAdss: [],
             clients: [],
+            clientProductIdsSelected:[],
+            clientProductIds:[],
 
 
 /****     client */
 
-          clientName:"",
-          currentStep: 1,
-          segment: "",
-          sousSegment: "",
-          categorie: "",
-          personnel : "",
-          typeCompte: "",
-          codeClient:"",
-          ancienCodeClient: "",
-          chargeCompte: {},
-          profil: "",        
-          statutRecouvrement:"",
-          active: false,        
-          facturation: "",
-          raisonSociale: "",
-          nombreSite: "",
-          multisite: false,
-          categorieSegment: "",
-          groupe: "",
-          dateDebut: "",
-          effectif: "",
-          secteurActivite: "",
-          matriculeFiscale: "",
-          tva: false ,
-          timbre: false  ,  
-          logo: "",
-          rue1: "" ,
-          rue2: "" ,
-          ville : "",
-          gouvernerat: "",
-          localite: "",
-          delegation : "",
-          codePostal: "",
-          tel : "",
-          gsm: "",
-          fax: "",
-          emailTopnet: "",
-          email1: "",
-          email2: "",
-          email3: "",
-          lattidue : "",
-          nomComplet: "",
-          products: "",
-          origine : "",
-          agenceOrigine: "",
-          info : "",
-          centrale : "",
-          couverture: "",
-          saturation: "",
-          fsi: "",
-          info: "",
-          clientLogo:
-            "https://www.gravatar.com/avatar/c13b5c99e9712a5e17789d046f5583a7",
-         
-          clientProductIds: [],
-          clientProductIdsSelected: [],
-         
-          image: {},
-          errors: {},
-          permission: {},
-          showProducts: false ,
-          show : true,
-          search : false,
-          hide : false,
-          selectedOption: false,
-        };
-        this.onChange = this.onChange.bind(this);
-        this.onSubmit = this.onSubmit.bind(this);
+users:[],
+user:[],
+userSelected:[],
+currentStep: 1,
+chargeCompte: {},
+profil: "",        
+active: false,        
+raisonSociale: "",
 
-        this.onSubmit2 = this.onSubmit2.bind(this);
-        this.SelectClientStateInputHandler = this.SelectClientStateInputHandler.bind(
-          this
-        );
-        this.componentDidMount=this.componentDidMount.bind(this)
-        this.SelectProductInputHandler = this.SelectProductInputHandler.bind(this);
-        this.onClickOui = this.onClickOui.bind(this);
-        this.onClickNon = this.onClickNon.bind(this);
-        this.getClassNameReactDatetimeDays = this.getClassNameReactDatetimeDays.bind(this);
+nombreSite: "",
+multisite: false,
+groupe: false,
+dateDebut: "",
+effectif: "",
+secteurActivite: "",
+matriculeFiscale: {},
+tva: false ,
+timbre: false  ,  
+
+logo: "",
+rue1: "" ,
+rue2: "" ,
+ville : "",
+gouvernerat: "",
+localite: "",
+delegation : "",
+codePostal: "",
+tel : "",
+gsm: "",
+fax: "",
+emailTopnet: "",
+email1: "",
+email2: "",
+email3: "",
+lattidue : "",
+nomComplet: "",
+products: [],
+productIdsSelected: [],
+fonction:"",
+
+image: {},
+
+errors: {},
+permission: {},
+showProducts: false ,
+show : true,
+search : false,
+searchInput: "",
+hide : false,
+selectedOption: false,
+result: false,
+client: {},
+abonnement:{}
+        };
+    this.onChange = this.onChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+    this.SelectClientStateInputHandler = this.SelectClientStateInputHandler.bind(
+      this
+    );
+    this.SelectProductInputHandler = this.SelectProductInputHandler.bind(this);
+    this.onClickOui = this.onClickOui.bind(this);
+    this.onClickNon = this.onClickNon.bind(this);
+
+    this.findClient = this.findClient.bind(this);
+    this.SelectInputHandler= this.SelectInputHandler.bind(this)
+    this.handleSubmit= this.handleSubmit.bind(this)
+    //this.ImageUploadRecievedHandler1a=this.ImageUploadRecievedHandler1a.bind(this)
+
+    
+
       }
-handleReactDatetimeChange = (who, date) => {
-        if (
-          this.state.startDate &&
-          who === "endDate" &&
-          new Date(this.state.startDate._d + "") > new Date(date._d + "")
-        ) {
-          this.setState({
-            startDate: date,
-            endDate: date
-          });
-        } else if (
-          this.state.endDate &&
-          who === "startDate" &&
-          new Date(this.state.endDate._d + "") < new Date(date._d + "")
-        ) {
-          this.setState({
-            startDate: date,
-            endDate: date
-          });
-        } else {
-          this.setState({
-            [who]: date
-          });
-        }
-      };
-getClassNameReactDatetimeDays = date => {
-        if (this.state.startDate && this.state.endDate) {
-        }
-        if (
-          this.state.startDate &&
-          this.state.endDate &&
-          this.state.startDate._d + "" !== this.state.endDate._d + ""
-        ) {
-          if (
-            new Date(this.state.endDate._d + "") > new Date(date._d + "") &&
-            new Date(this.state.startDate._d + "") < new Date(date._d + "")
-          ) {
-            return " middle-date";
-          }
-          if (this.state.endDate._d + "" === date._d + "") {
-            return " end-date";
-          }
-          if (this.state.startDate._d + "" === date._d + "") {
-            return " start-date";
-          }
-        }
-        return "";
-      };
+/*********************** */
+fetchUsers() {
+  axios
+    .get(`${this.server}/api/users/`)
+    .then((response) => {
+      this.setState({ users: response.data });
+    })
+    .catch((err) => {
+      console.log(err.response);
+    });
+}
 handleOptionChange(e) {
-        this.setState({
-          selectedOption: e.target.value
-        });
-      }
+  this.setState({
+    selectedOption: e.target.value
+  });
+}
 onClickOui(){
-        this.setState({show:false, search:true})
-       
-       } 
-onClickNon(){  this.setState({show:false, hide:true}) }
-         
-    
+  this.setState({show:false, search:true})
+ } 
+onClickNon(){
+   this.setState({show:false, hide:true})
+   }
+   
+findClient(matricule){
+  const mat = matricule.value ;
+  this.setState({ searchInput: mat})
+  this.props.getClientByMatricule(mat);
+  this.setState({ result : true, search: false});
+
+}
+/*------------------------*/
 componentWillMount() {
-        //get product from db
-       // this.props.getAllProducts();
-    
-        //get country codes
-        const SelectDataForm = [];
-        const CountryData = [...CountriesData];
-        CountryData.map((country) => {
-          //country code and country name mapping to id: text:
-          return SelectDataForm.push({
-            value: country.code,
-            label: country.name + " (" + country.code + ")",
-          });
-        });
-        this.setState({ CountriesData: SelectDataForm });
-        console.log(CountriesData);
-      }
-    
-    
-collapsesToggle = (collapse) => {
-    let openedCollapses = this.state.openedCollapses;
-    if (openedCollapses.includes(collapse)) {
-      this.setState({
-        openedCollapses: [],
-      });
-    } else {
-      this.setState({
-        openedCollapses: [collapse],
-      });
-    }
-  };
-    
-onChange(e) {
-        this.setState({ [e.target.name]: e.target.value });
-      }
-    
-      //on Change select client state
-SelectClientStateInputHandler = (e) => {
-        this.setState({ clientState: e.value });
-      };
-    
-      //on Change select product
-SelectProductInputHandler = (selectedOptions) => {
-        const clientProductIds = selectedOptions;
-        this.setState({ clientProductIdsSelected: clientProductIds });
-      };
-    
-      //OnChange Select Country Handler
-SelectCounrtyHandler = (selectedOptions) => {
-        const clientCountryCode = selectedOptions;
-        this.setState({ clientCountryCodeSelected: clientCountryCode });
-       // console.log("selected country code ", clientCountryCode )
-        this.setState({clientProductIdsSelected:[]})
-        this.props.getProductsByCountryCode(clientCountryCode.value);
-       // console.log(this.props.getProductsByCountryCode(selectedOptions.value))
-      };
-ImageUploadRecievedHandler = (img) => {
-        this.setState({ image: img });
-      };
-     
-getProduct(){
-        const id = this.state.clientCountryCodeSelected.map((country) => {
-          return country.value;
-        }); 
-        this.getProductById(id);
-        
-      }
-onSubmit(e) {
-        e.preventDefault();
-        if (this.state.image.name !== undefined) {
-          /*  */
-          let path_to_upload = "clients"; // $ /
-          let imageName = this.state.image.name.toLowerCase().split(" ").join("-");
-          this.state.clientLogo =
-            path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
-          const formData = new FormData();
-    
-          formData.append("img", this.state.image);
-          this.props.uploadImage(formData, path_to_upload);
-        }
-        
-    
-        const clientData = {
-            
-            chargeCompte: this.state.chargeCompte,
-            profil: this.state.profil,        
-            statutRecouvrement:this.state.statutRecouvrement,
-            active: this.state.active,        
-            facturation: this.state.facturation,
-            raisonSociale: this.state.raisonSociale,
-            nombreSite:this.state.nombreSite,
-            multisite: this.state.multisite,
-            categorieSegment: this.state.categorieSegment,
-            groupe:this.state.groupe,
-            dateDebut: this.state.dateDebut,
-            effectif:this.state.effectif,
-            secteurActivite: this.state.secteurActivite,
-            matriculeFiscale: this.state.matriculeFiscale,
-            tva: this.state.tva ,
-            timbre: this.state.timbre  ,  
-            logo:this.state.logo,
-            rue1: this.state.rue1 ,
-            rue2: this.state.rue2 ,
-            ville : this.state.ville,
-            gouvernerat: this.state.gouvernerat,
-            localite: this.state.localite,
-            delegation : this.state.delegation,
-            codePostal: this.state.codePostal,
-            tel : this.state.tel,
-            gsm: this.state.gsm,
-            fax: this.state.fax,
-            emailTopnet: this.state.emailTopnet,
-            email1: this.state.email1,
-            email2: this.state.email2,
-            email3: this.state.email3,
-            lattidue : this.state.lattidue,
-            nomComplet: this.state.nomComplet,
-            products: this.state.clientProductIdsSelected.map((product) => {
-              return product.value;}),
-            origine : this.state.origine,
-            agenceOrigine: this.state.agenceOrigine,
-            info :this.state.info,
-            centrale : this.state.centrale,
-            couverture: this.state.couverture,
-            saturation: this.state.saturation,
-            fsi: this.state.fsi,
-            info: this.state.info ,
-        };
-        this.props.createClient(clientData, this.props.history);
-      }
-
-onSubmit2(e) {
-        e.preventDefault();
-        const clientData = {
-          clientName: this.state.clientName,
-          clientState: this.state.clientState,
-          clientLogo: this.state.clientLogo,
-          clientCountryCode: this.state.clientCountryCode,
-          
-        };
-        this.props.editClient(this.state.id, clientData, this.props.history);
-      }
 
 
+  this.fetchUsers();
+  //get country codes
+  const SelectDataForm = [];
+  const fonction = [...Fonction];
+  fonction.map((fct) => {
+    //country code and country name mapping to id: text:
+    return SelectDataForm.push({
+      value: fct.num,
+      label: fct.fonction + " (" + fct.num + ")",
+    });
+  });
+  this.setState({ 
+    fonction: SelectDataForm ,
+  });
+  console.log(fonction);
+
+  const gouvernoratData = [];
+  const gouvernoratS = [...Adresse];
+  gouvernoratS.map((ad)=>{
+    return gouvernoratData.push({
+      value : ad.id,
+      label: ad.gouvernorat
+    })
+  })
+  this.setState({gouvernoratS: gouvernoratData })
+  console.log(gouvernoratS);
+
+
+  const LocaliteData = [];
+  const localiteS = [...Adresse];
+  localiteS.map((ad)=>{
+    return LocaliteData.push({
+      value : ad.id,
+      label: ad.localite
+    })
+  })
+  this.setState({localiteS: LocaliteData })
+  console.log(localiteS);
+
+  const delegationData = [];
+  const delegationS = [...Adresse];
+  delegationS.map((ad)=>{
+    return delegationData.push({
+      value : ad.id,
+      label: ad.delegation
+    })
+  })
+  this.setState({delegationS: delegationData })
+  console.log("del",delegationS);
+
+
+  const CodePostalData = [];
+  const codePostalS = [...Adresse];
+  codePostalS.map((ad)=>{
+    return CodePostalData.push({
+      value : ad.id,
+      label: ad.codePostal
+    })
+  })
+  this.setState({codePostalS: CodePostalData })
+  
+
+
+  /*this.props.getClient(this.state.id).then((response) =>
+    this.setState({
+    chargeCompte: response.payload.chargeCompte,
+    profil: response.payload.profil,
+    active: response.payload.active,
+    raisonSociale: response.payload.raisonSociale,
+    nombreSite: response.payload.nombreSite,
+    multisite: response.payload.multisite,
+    groupe: response.payload.groupe,
+    dateDebut: response.payload.dateDebut,
+    effectif: response.payload.effectif,
+
+    secteurActivite: response.payload.secteurActivite,
+    matriculeFiscale: response.payload.matriculeFiscale,
+    registreCommerce : response.payload.registreCommerce,
+    chiffreAffaire : response.payload.chiffreAffaire,
+    tva: response.payload.tva,
+    timbre: response.payload.timbre,
+    logo: response.payload.logo,
+
+     rue1: response.payload.rue1,
+     rue2: response.payload.rue2,
+     ville : response.payload.ville,
+     gouvernerat: response.payload.gouvernerat,
+     localite:response.payload.localite,
+     delegation : response.payload.delegation,
+     codePostal: response.payload.codePostal,
+     pays : response.payload.pays,
+     tel : response.payload.tel,
+     gsm: response.payload.gsm,
+     fax: response.payload.fax,
+     emailTopnet: response.payload.emailTopnet,
+     email1: response.payload.email1,
+     email2: response.payload.email2,
+     email3: response.payload.email3,
+     nomComplet: response.payload.nomComplet,
+     contact: response.payload.contact,
+    
+    clientPIds: response.payload.products.map((obj, index) => 
+    {return {
+      value : obj,
+      label : obj.title
+    }} ),
+  })
+);*/
+
+//get product from db
+this.props.getAllProducts();
+
+//get ads from db
+
+this.fetchClients();
+
+}
+fetchClients() {
+  axios
+    .get(`${this.server}/api/clients/list`)
+    .then((response) => {
+      this.setState({ clients: response.data });
+    })
+    .catch((err) => {
+      console.log(err.response);
+    });
+}
+
+//getting data from reducer
+componentWillReceiveProps(nextProps) {
+
+  if (nextProps.errors) {
+    this.setState({ errors: nextProps.errors });
+  }
+  if (nextProps.client) {
+    const client = nextProps.client;
+    // console.log( nextProps.client.client);
+
+    this.setState({
       
-  componentDidMount() {
-    this.props.getClient(this.state.id).then((response) =>
-      this.setState({
-        //clientName: response.payload.clientName,
-        clientState: response.payload.clientState,
-        clientLogo: response.payload.clientLogo,
-        clientCountryCode: response.payload.clientCountryCode,
-        clientProductIds: response.payload.clientProductIds,
-        
-        clientPIds: response.payload.clientProductIds.map((obj, index) => 
-        {return {
-          value : obj,
-          label : obj.title
-        }} ),
-      })
+      products: client.products,
+    });
+  }
+
+
+  if (nextProps.abonnement) {
+    const abonnement = nextProps.abonnement;
+  }
+
+  //assign product
+  if (nextProps.products) {
+    const mappedProductIds = nextProps.products.products.map((cp) => {
+      return {
+        value: cp,
+        label: cp.title,
+      };
+    });
+
+   const mappedSelected =  this.state.clientPIds.map((obj, index) => 
+          {return {
+            value : obj,
+            label : obj.title
+          }} )
+    
+    let selectedDataProducts = mappedProductIds.filter((obj) =>
+      this.state.clientPIds.some((object) => object === obj.value)
     );
 
-    //get product from db
-    this.props.getAllProducts();
-
-    //get ads from db
-   
-    this.fetchClients();
+    this.setState({
+      products: mappedProductIds,
+      clientProductIdsSelected:this.state.clientPIds ,
+    });
   }
-  // Fetch data from the back-end
-  fetchClients() {
-    axios
-      .get(`${this.server}/api/clients/list`)
-      .then((response) => {
-        this.setState({ clients: response.data });
-      })
-      .catch((err) => {
-        console.log(err.response);
-      });
-  }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.errors) {
-      this.setState({ errors: nextProps.errors });
-    }
-    if (nextProps.client) {
-      const client = nextProps.client;
-      // console.log( nextProps.client.client);
 
-      this.setState({
-        clientName: client.clientName,
-        clientState: client.clientState,
-        clientLogo: client.clientLogo,
-        clientCountryCode: client.clientCountryCode,
-        clientProductIds: client.clientProductIds,
-      });
-    }
-    //assign product
-    if (nextProps.products) {
-      const mappedProductIds = nextProps.products.products.map((cp) => {
-      
-        return {
-          value: cp,
-          label: cp.title,
-        };
-      });
+ 
+}
 
-     const mappedSelected =  this.state.clientPIds.map((obj, index) => 
-            {return {
-              value : obj,
-              label : obj.title
-            }} )
-      
-      let selectedDataProducts = mappedProductIds.filter((obj) =>
-        this.state.clientPIds.some((object) => object === obj.value)
-      );
-
-      this.setState({
-        clientProductIds: mappedProductIds,
-        clientProductIdsSelected:this.state.clientPIds ,
-      });
-    }
-
-   
-  }
 onChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
-  }    
+  this.setState({ [e.target.name]: e.target.value });
+}
 
-      /************************************************************* */
+
+SelectInputHandler = (selectedOptions) => {
+  const fonction = selectedOptions;
+  this.setState({ profil: fonction.value });
+  //set validation to true
+//  this.state.validation["country_code"] = true;
+};
+
+//user 
+SelectUserHandler= (selectedOptions)=> {
+  const user = selectedOptions;
+  this.setState({userSelected: user })
+}
+
+//on Change select client state
+SelectClientStateInputHandler = (e) => {
+  this.setState({ clientState: e.value });
+};
+
+
+
+
+ImageUploadRecievedHandler1a = (img) => {
+  this.setState({ fichier1rectoimg: img });
+};
+ImageUploadRecievedHandler1b = (img) => {
+  this.setState({ fichier1versoimg: img });
+};
+ImageUploadRecievedHandler2a = (img) => {
+  this.setState({ fichier2rectoimg: img });
+};
+
+ImageUploadRecievedHandler2b = (img) => {
+  this.setState({ fichier2versoimg: img });
+};
+ImageUploadRecievedHandler3a = (img) => {
+  this.setState({ fichier3rectoimg: img });
+};
+
+ImageUploadRecievedHandler3b = (img) => {
+  this.setState({ fichier3versoimg: img });
+};
+ImageUploadRecievedHandler = (img) => {
+  this.setState({ image: img });
+};
+
+
+onSubmit(e) {
+  e.preventDefault();
+  if (this.state.image.name !== undefined) {
+    /*  */
+    let path_to_upload = "clients"; // $ /
+    let imageName = this.state.image.name.toLowerCase().split(" ").join("-");
+    this.state.clientLogo =
+      path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+    const formData = new FormData();
+
+    formData.append("img", this.state.image);
+    this.props.uploadImage(formData, path_to_upload);
+  }
+
+  const clientData = {
+      
+      chargeCompte: this.state.chargeCompte,
+      profil: this.state.profil,        
+      active: this.state.active,        
+      raisonSociale: this.state.raisonSociale,
+      nombreSite:this.state.nombreSite,
+      multisite: this.state.multisite,
+      groupe:this.state.groupe,
+      dateDebut: this.state.dateDebut,
+      effectif:this.state.effectif,
+      secteurActivite: this.state.secteurActivite,
+      matriculeFiscale: this.state.matriculeFiscale,
+      tva: this.state.tva ,
+      timbre: this.state.timbre  ,  
+      logo:this.state.logo,
+      rue1: this.state.rue1 ,
+      rue2: this.state.rue2 ,
+      ville : this.state.ville,
+      gouvernerat: this.state.gouvernerat,
+      localite: this.state.localite,
+      delegation : this.state.delegation,
+      codePostal: this.state.codePostal,
+      tel : this.state.tel,
+      gsm: this.state.gsm,
+      fax: this.state.fax,
+      emailTopnet: this.state.emailTopnet,
+      email1: this.state.email1,
+      email2: this.state.email2,
+      email3: this.state.email3,
+      nomComplet: this.state.nomComplet,
+      
+  };
+  this.props.createClient(clientData, this.props.history);
+}
+/********************************************************************* */
+
+
+
+
+/********************************************************************* */
+SelectProductInputHandler = (selectedOptions) => {
+  console.log("select  product inp handler")
+  const clientProductIds = selectedOptions;
+  this.setState({ clientProductIdsSelected: clientProductIds });
+};
+
+
+      /**************************************** */
     handleChange = event => {
       const {name, value} = event.target
       this.setState({
@@ -478,12 +543,118 @@ onChange(e) {
     }
      
     handleSubmit = event => {
+     
       event.preventDefault()
-      const { email, username, password } = this.state
-      alert(`Your registration detail: \n 
-             Email: ${email} \n 
-             Username: ${username} \n
-             Password: ${password}`)
+      //// parite client
+      
+     if (this.state.image.name !== undefined) {
+
+        let path_to_upload = "clients"; // $ /
+        let imageName = this.state.image.name.toLowerCase().split(" ").join("-");
+        this.state.clientLogo =
+          path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+        const formData = new FormData();
+  
+        formData.append("img", this.state.image);
+        this.props.uploadImage(formData, path_to_upload);
+      }
+
+      if (this.state.fichier1rectoimg.name !== undefined) {
+
+        let path_to_upload = "abonnement"; // $ /
+        let imageName = this.state.fichier1rectoimg.name.toLowerCase().split(" ").join("-");
+        this.state.fichier1recto =
+          path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+        const formData = new FormData();
+  
+        formData.append("img", this.fichier1rectoimg);
+        this.props.uploadImage(formData, path_to_upload);
+      }
+      if (this.state.fichier2versoimg.name !== undefined) {
+
+        let path_to_upload = "abonnement"; // $ /
+        let imageName = this.state.fichier2versoimg.name.toLowerCase().split(" ").join("-");
+        this.state.fichier2recto =
+          path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+        const formData = new FormData();
+  
+        formData.append("img", this.fichier2versoimg);
+        this.props.uploadImage(formData, path_to_upload);
+      }
+
+
+
+  
+      const clientData = {
+          
+          chargeCompte: this.state.chargeCompte,
+          profil: this.state.profil,        
+          active: this.state.active,        
+          raisonSociale: this.state.raisonSociale,
+          nombreSite:this.state.nombreSite,
+          multisite: this.state.multisite,
+          groupe:this.state.groupe,
+          dateDebut: this.state.dateDebut,
+          effectif:this.state.effectif,
+          secteurActivite: this.state.secteurActivite,
+          matriculeFiscale: this.state.matriculeFiscale,
+          tva: this.state.tva ,
+          timbre: this.state.timbre  ,  
+          logo:this.state.logo,
+          rue1: this.state.rue1 ,
+          rue2: this.state.rue2 ,
+          ville : this.state.ville,
+          gouvernerat: this.state.gouvernerat,
+          localite: this.state.localite,
+          delegation : this.state.delegation,
+          codePostal: this.state.codePostal,
+          tel : this.state.tel,
+          gsm: this.state.gsm,
+          fax: this.state.fax,
+          emailTopnet: this.state.emailTopnet,
+          email1: this.state.email1,
+          email2: this.state.email2,
+          email3: this.state.email3,
+          nomComplet: this.state.nomComplet,
+          
+      };
+      this.props.createClient(clientData, this.props.history);
+
+      
+    
+
+
+     //// parite produit
+    const products= this.state.clientProductIdsSelected.map((product) => {
+      return product.value;
+    })
+     alert("Your registration detail:"+products.length+products[0]._id)
+
+
+
+     /////////////// parite abonnement
+     
+     const abonnementData = {
+          
+      clientId: this.state.client._id,
+      productId: products[0]._id,        
+      debit: this.state.debit,        
+      fichier1recto: this.state.fichier1recto,
+      fichier1verso:this.state.fichier1verso,
+      fichier2recto: this.state.fichier2recto,
+      fichier2verso:this.state.fichier2verso,
+      fichier3recto: this.state.fichier3recto,
+      fichier3verso: this.state.fichier3verso,
+      modePaiement: this.state.modePaiement,
+      telADSL : this.state.telADSL  ,
+      etat : false
+
+      
+  };
+  console.log(this.state.matriculeFiscale+"/"+abonnementData.productId +"/"+this.state.debit+"/"+this.state.fichier1recto+"/"+this.state.fichier1verso+"/")
+ 
+this.props.createAbonnement(abonnementData, this.props.history);
+
     }
     
     _next = () => {
@@ -566,36 +737,41 @@ render() {
   <form onSubmit={this.handleSubmit}>
         {/* 
           render the form steps and pass required props in
+         
         */}
-          <Step1 
+         
+      <Step1 
             currentStep={this.state.currentStep} 
-            handleChange={this.handleChange}
+            fetchUsers={this.fetchUsers}
+            handleOptionChange={this.handleOptionChange}
             onClickOui={this.onClickOui}
             onClickNon={this.onClickNon}
-            onSubmit={this.onSubmit}
-            SelectSegInputHandler={this.SelectSegInputHandler}
-            email={this.state.email}
-            segment={this.state.segment}
-            sousSegment={this.state.sousSegment}
-            categorie={this.state.categorie}
-            personnel={this.state.personnel}
-            typeCompte={this.state.typeCompte}
-            codeClient={this.state.codeClient}
-            ancienCodeClient={this.state.ancienCodeClient}
+            findClient={this.findClient}
+            onChange={this.onChange}
+            SelectInputHandler={this.SelectInputHandler}
+            SelectUserHandler={this.SelectUserHandler}
+            handleChange={this.handleChange}
+            //////////////////////
+            show={this.state.show}
+            search={this.state.search}
+            hide={this.state.hide}
+            btnOui={this.state.btnOui}
+            btnNon={this.state.btnNon}
+            searchInput={this.state.searchInput}
+            client={this.state.client}
+            nomComplet={this.state.nomComplet}
             chargeCompte={this.state.chargeCompte}
-            profil={this.state.profil}
-            statutRecouvrement={this.state.statutRecouvrement}
-            active={this.state.active}
-            facturation={this.state.facturation}
+            fonction={this.state.fonction}
             raisonSociale={this.state.raisonSociale}
             nombreSite={this.state.nombreSite}
             multisite={this.state.multisite}
-            categorieSegment={this.state.categorieSegment}
             groupe={this.state.groupe}
             effectif={this.state.effectif}
-            tva={this.state.tva}
+            segment={this.state.segment}
+            sousSegment={this.state.sousSegment}
+            email={this.state.email}
             timbre={this.state.timbre}
-            logo={this.state.logo}
+            tva={this.state.tva}
             rue1={this.state.rue1}
             rue2={this.state.rue2}
             ville={this.state.ville}
@@ -610,8 +786,23 @@ render() {
             email1={this.state.email1}
             email2={this.state.email2}
             email3={this.state.email3}
+            selectedOption={this.state.selectedOption}
+            users={this.state.users}
+     
+           /*
+            categorie={this.state.categorie}
+            personnel={this.state.personnel}
+            typeCompte={this.state.typeCompte}
+            codeClient={this.state.codeClient}
+            ancienCodeClient={this.state.ancienCodeClient}
+            profil={this.state.profil}
+            statutRecouvrement={this.state.statutRecouvrement}
+            active={this.state.active}
+            facturation={this.state.facturation}
+            categorieSegment={this.state.categorieSegment}
+            groupe={this.state.groupe}
+            effectif={this.state.effectif}
             lattidue={this.state.lattidue}
-            nomComplet={this.state.nomComplet}
             products={this.state.products}
             origine={this.state.origine}
             agenceOrigine={this.state.agenceOrigine}
@@ -627,14 +818,16 @@ render() {
             image={this.state.image}
             errors={this.state.errors}
             permission={this.state.permission}
-            showProducts={this.state.showProducts}
-            show={this.state.show}
-            search={this.state.search}
-            hide={this.state.hide}
-            selectedOption={this.state.selectedOption}
-          />
-          <Step2 
+            showProducts={this.state.showProducts}*/
+            
+            
+        />
+        <Step2 
+
+            clientProductIdsSelected={this.state.clientProductIdsSelected}
+            clientProductIds={this.clientProductIds}
             currentStep={this.state.currentStep} 
+            debit={this.state.debit}
             handleChange={this.handleChange}
             openedCollapses={this.state.openedCollapses}
             onSubmit2={this.state.onSubmit2}
@@ -647,8 +840,6 @@ render() {
             clientPIds={this.clientPIds}
             clientCountryCode={this.clientCountryCode}
             clientCountryCodeSelected={this.clientCountryCodeSelected}
-            clientProductIds={this.clientProductIds}
-            clientProductIdsSelected={this.state.clientProductIdsSelected}
             CountriesData={this.CountriesData}
             errors={this.errors}
             clientAdss={this.clientAdss}
@@ -659,12 +850,18 @@ render() {
           <Step3 
             startDate={this.state. startDate}
             endDate={this.state. endDate}
-            fichier1={this.state.fichier1}
-            fichier2={this.state.fichier2}
+            fichier1recto={this.state.fichier1recto}
+            fichier1verso={this.state.fichier1verso}
+            fichier2recto={this.state.fichier2recto}
+            fichier2verso={this.state.fichier2verso}
+            fichier3recto={this.state.fichier3recto}
+            fichier3verso={this.state.fichier3verso}
+            telADSL={this.telADSL}
+            
+            modePaiement={this.modePaiement}
             currentStep={this.state.currentStep} 
             handleChange={this.handleChange}
-            getClassNameReactDatetimeDays={this.getClassNameReactDatetimeDays}
-            handleReactDatetimeChange={this.handleReactDatetimeChange}
+            handleSubmit={this.handleSubmit}
           />
          
           {this.previousButton()}
@@ -692,967 +889,1116 @@ render() {
   }
   
   function Step1(props) {
+    
     if (props.currentStep !== 1) {
+    
       return null
     } 
     return (
-        <>
-          {/********************  NOTIFICATION DIV  *********************/}
-  
-       {/* <div className="rna-wrapper">
-            <NotificationAlert ref="notify" />
-          </div>
-  
-          
-          <SimpleHeader name="Add Client" parentName="Clients" />*/} 
-           <br/>
-          <br/>
-          <br/>
-          <br/>
-          <Container className="mt--6" fluid>
-         {console.log(props.show)}
-          {props.show ?
-          
-          <center>
-          
-          <br/>
-          <br/>
-                  <Col lg="5">
-                  <Card className="bg-secondary shadow border-0">
-                      <CardHeader className="bg-white pb-5">
-                          <div className="text-center">
-                          <h4 className="mb-1"> C'est un client Topnet ? </h4>
-                            </div>
-                        </CardHeader>
-                        <CardBody className="px-lg-5 py-lg-5">
-                          <center>
-                        <Button name={props.btnOui} color="success" onClick={props.onClickOui}>Oui</Button>
-                        <Button name={props.btnNon} onClick={props.onClickNon}>Non</Button> 
-                        </center>
-                        </CardBody>
-                        
-  
-                        </Card>
-                  </Col> 
-                  
-          <br/><br/>
-          <br/><br/>
-          <br/><br/>
-          <br/><br/>
-          <br/><br/>
-          <br/><br/>
-          <br/><br/>
-          </center>
-                   : null }
-                  
-           
-          {props.search ?
-          <center>
-            <br/><br/>
-                  <Col lg="5">
-                  <Card className="bg-secondary shadow border-0">
-                      <CardHeader className="bg-white pb-5">
-                      <h4 className="mb-1"> Récuperer ses coordonnées</h4>
-                        <p className="mt-1">
-                        avec un seul click
-                        </p>
-                        
-                        </CardHeader>
-                        <CardBody className="px-lg-5 py-lg-5">
-                        <div className="text-center">
-                        Entrer  sa matricule {" "}
-                        </div>
-                        
-                        <br/>
-                        <br/>
-                        <Form role="form">
-                          <FormGroup>
-                            <InputGroup className="input-group-alternative mb-3">
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-email-83" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input placeholder="adresse mail" type="text" />
-                            </InputGroup>
-                          </FormGroup>
-                          <div className="text-center">
-                            <Button
-                              className="mt-4"
-                              color="primary"
-                              type="button"
-                            >
-                              Valider 
-                            </Button>
-                            <Button
-                              className="mt-4"
-                              color=""
-                              type="button"
-                              href="/admin/abonnement"
-                            >
-                              Retour
-                            </Button>
-                          </div>
-                        </Form>
-  
-                        </CardBody>
-                        
-  
-                        </Card>
-                  </Col> 
-                  <br/><br/>
-                  <br/><br/>
-                  <br/><br/>
-                  <br/><br/>
-                  <br/><br/>
-                  <br/><br/>
-                  <br/><br/>
-          </center>
-                  : null}
-                   {props.hide ? 
-              <Card>
-                <CardHeader className="text-center">
-                  <Col xs="2">
-                    <h3 className="mb-0">Add New Client</h3>
-                  </Col>
-                  <Col className="text-right" xs="4"></Col>
-                </CardHeader>
-                <CardBody className="text-center">
-                  <div >
-                    <h6 className="heading-small text-muted mb-4">
-                    Information Client 
-                    </h6>
-                    <div className="pl-lg-4">
-                    <Row>
-    
-                     <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Chargé de compte
+      <>
+      {/********************  NOTIFICATION DIV  *********************/}
+
       
-                                </label>
-                            <Select
-                              defaultValue={segOptions[1]}
-                              name="chargeCompte"
-                              options={catOptions}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                     </Row>
-                      
-  
-                      <hr className="my-4" />
-  
-                      <h6 className="heading-small text-muted mb-4">
-                       Données Générales
-                      </h6>
-                      <div className="pl-lg-4"></div>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Raison Sociale
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Raison Sociale"
-                                type="text"
-                                name="raisonSociale"
-                                value={props.codeClient}
-                                onChange={props.handleChange}
-                                
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                        
-                        
-  
-                
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Multi-sites
-                            </label>
-                            <Select
-                              defaultValue={Options[1]}
-                              name="multisites"
-                              options={Options}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Nombre des sites
-                            </label>
-                            <Select
-                              defaultValue={Options[1]}
-                              name="nombreSite"
-                              options={Options}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Groupe de société
-                            </label>
-                            <Select
-                              defaultValue={Options[1]}
-                              name="groupe"
-                              options={Options}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                             Effectif
-                            </label>
-                            <Select
-                              defaultValue={Options[1]}
-                              name="effectif"
-                              options={Options}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <hr className="my-4" />
-  
-                      <h6 className="heading-small text-muted mb-4">
-                      Contacts Principales
-                      </h6>
-                      <div className="pl-lg-4"></div>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Contact principal
-                            </label>
-                            <Select
-                              defaultValue={segOptions[1]}
-                              name="segment"
-                              options={segOptions}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Contact Technique
-                            </label>
-                            <Select
-                              defaultValue={ssegOptions[1]}
-                              name="sousSegment"
-                              options={ssegOptions}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row><Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Contact Financier
-                            </label>
-                            <Select
-                              defaultValue={segOptions[1]}
-                              name="segment"
-                              options={segOptions}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Contact Juridique
-                            </label>
-                            <Select
-                              defaultValue={ssegOptions[1]}
-                              name="sousSegment"
-                              options={ssegOptions}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <hr className="my-4" />
-  
-                      <h6 className="heading-small text-muted mb-4">
-                        Information sur le compte
-                      </h6>
-                      <div className="pl-lg-4"></div>
-                      <Row>
-                      <Col lg="12">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Secteur d'activité
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Secteur d'activité"
-                                type="text"
-                                name="secteurActivite"
-                                value={props.secteurActivite}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                        
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Matricule Fiscale
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Matricule Fiscale"
-                                type="text"
-                                name="matriculeFiscale"
-                                value={props.matriculeFiscale}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Registre de commerce
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Registre de commerce"
-                                type="text"
-                                name="registreCommerce"
-                                value={props.registreCommerce}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Chiffre d'affaires annuel
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Chiffre d'affaire"
-                                type="text"
-                                name="chiffreAffaire"
-                                value={props.chiffreAffaire}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Exonération TVA
-                            </label>
-                            <Select
-                              defaultValue={Options[1]}
-                              name="tva"
-                              options={Options}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Exonération Timbre
-                            </label>
-                            <Select
-                              defaultValue={Options[1]}
-                              name="timbre"
-                              options={Options}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-  
-                      <hr className="my-4" />
-  
-                      <h6 className="heading-small text-muted mb-4">
-                       Coordonnées principales
-                      </h6>
-                      <div className="pl-lg-4"></div>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Rue (1)
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Rue (1)"
-                                type="text"
-                                name="rue1"
-                                value={props.rue1}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Rue (2)
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Rue (2)"
-                                type="text"
-                                name="rue2"
-                                value={props.rue2}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Gouvernerat
-                            </label>
-                            <Select
-                              defaultValue={Options[1]}
-                              name="gouvernerat"
-                              options={Options}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Délégation
-                            </label>
-                            <Select
-                              defaultValue={Options[1]}
-                              name="delegation"
-                              options={Options}
-                              className="basic-multi-select"
-                              classNamePrefix="select"
-                              onChange={props.SelectSSegInputHandler}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Localité
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Localité"
-                                type="text"
-                                name="locatile"
-                                value={props.localite}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Code postal
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Code postal"
-                                type="text"
-                                name="codePostal"
-                                value={props.codePostal}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Ville
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Ville"
-                                type="text"
-                                name="ville"
-                                value={props.ville}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Pays/région
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Pays/Région"
-                                type="text"
-                                name="pays"
-                                value={props.pays}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Tél
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Tél"
-                                type="text"
-                                name="tel"
-                                value={props.tel}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Fax
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Fax"
-                                type="text"
-                                name="fax"
-                                value={props.fax}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             GSM
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="GSM"
-                                type="text"
-                                name="gsm"
-                                value={props.gsm}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Email (1)
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Email (1)"
-                                type="text"
-                                name="email1"
-                                value={props.email1}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Email (2)
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Email (2)"
-                                type="text"
-                                name="email2"
-                                value={props.email2}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Email (3)
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Email (3)"
-                                type="text"
-                                name="email3"
-                                value={props.email3}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                      <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Email Topnet
-                            </label>
-                            <InputGroup
-                              className={classnames("input-group-merge")}
-                            >
-                              <InputGroupAddon addonType="prepend">
-                                <InputGroupText>
-                                  <i className="ni ni-single-02" />
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <Input
-                                id="input-username"
-                                placeholder="Email Topnet"
-                                type="text"
-                                name="emailTopnet"
-                                value={props.emailTopnet}
-                                onChange={props.handleChange}
-                              />
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-username"
-                            >
-                             Création nouveau email
-                            </label>
-                            <div className="radio">
-                    <label>
-                      <input type="radio" value="option1" onChange={props.handleOptionChange}  />
-                      Oui
-                    </label>
-                  </div>
-                  <div className="radio">
-                    <label>
-                      <input type="radio" value="option2" onChange={props.handleOptionChange}  />
-                      Non
-                    </label>
-                  </div>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      
+      <Container className="mt--6" fluid>
+     
+      {props.show ?
+      
+      <center>
+      <br/>
+      <br/>
+              <Col lg="5">
+              <Card className="bg-secondary shadow border-0">
+                  <CardHeader className="bg-white pb-5">
+                      <div className="text-center">
+                      <h4 className="mb-1"> C'est un client Topnet ? </h4>
+                        </div>
+                    </CardHeader>
+                    <CardBody className="px-lg-5 py-lg-5">
+                      <center>
+                    <Button name={props.btnOui} color="success" onClick={props.onClickOui}>Oui</Button>
+                    <Button name={props.btnNon} onClick={props.onClickNon}>Non</Button> 
+                    </center>
+                    </CardBody>
+                    
+
+                    </Card>
+              </Col> 
+              
+      <br/><br/>
+      <br/><br/>
+      <br/><br/>
+      <br/><br/>
+      <br/><br/>
+      <br/><br/>
+      <br/><br/>
+      </center>
+               : 
+           null
+                }
+              
+       
+      {props.search ?
+      <center>
+        <br/><br/>
+              <Col lg="5">
+              <Card className="bg-secondary shadow border-0">
+                  <CardHeader className="bg-white pb-5">
+                  <h4 className="mb-1"> Récuperer ses coordonnées</h4>
+                    <p className="mt-1">
+                    avec un seul click
+                    </p>
+                    
+                    </CardHeader>
+                    <CardBody className="px-lg-5 py-lg-5">
+                    <div className="text-center">
+                    Entrer  sa matricule {" "}
                     </div>
-                   
-                    <hr className="my-4" />
-                    <Button color="primary" onClick={props.onSubmit}>
-                      Ajouter
-                    </Button>
+                    
+                    <br/>
+                    <br/>
+                    <Form role="form">
+                      <FormGroup>
+                        <InputGroup className="input-group-alternative mb-3">
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-email-83" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                           id="searchInput"
+                           placeholder="matricule"
+                           name="searchInput" 
+                           type="text"
+                           onChange={props.onChange}
+                           value={props.searchInput}
+                            />
+                        </InputGroup>
+                      </FormGroup>
+                     
+                      <div className="text-center">
+                        <Button
+                          className="mt-4"
+                          color="primary"
+                          type="button"
+                          onClick={props.findClient}
+                        >
+                          Valider 
+                        </Button>
+                        <Button
+                          className="mt-4"
+                          color=""
+                          type="button"
+                          href="/admin/add-client"
+                        >
+                          Retour
+                        </Button>
+                      </div>
+                    </Form>
+                 
+
+                    </CardBody>
+                    
+
+                    </Card>
+              </Col> 
+              <br/><br/>
+              <br/><br/>
+              <br/><br/>
+              <br/><br/>
+              <br/><br/>
+              <br/><br/>
+              <br/><br/>
+      </center>
+              : null}
+
+{props.result ?
+      <center>
+        <br/><br/>
+              <Col lg="12">
+              <Card className="bg-secondary shadow border-0">
+                  <CardHeader className="bg-white pb-5">
+                  <h4 className="mb-1">Affecter un nouveau forfait</h4>
+                    <p className="mt-1">
+                    </p>
+                    
+                    </CardHeader>
+                    <CardBody className="px-lg-5 py-lg-5">
+                    <div className="text-center">
+                    Information client {" "}
+                    </div>
+                    
+                    <br/>
+                    <br/>
+                    <div className="text-center">
+                    {props.client.clientName} {" "}
+                    </div>
+                     
+                      <div className="text-center">
+                        <Button
+                          className="mt-4"
+                          color="primary"
+                          type="button"
+                          to={`/admin/assign-product/${props.client._id}`}
+                         tag={Link}
+                        >
+                          Abonnement 
+                        </Button>
+                        <Button
+                          className="mt-4"
+                          color=""
+                          type="button"
+                          href="/admin/add-client"
+                        >
+                          Retour
+                        </Button>
+                      </div>
+                    </CardBody>
+                    
+
+                    </Card>
+              </Col> 
+              <br/><br/>
+              <br/><br/>
+              <br/><br/>
+              <br/><br/>
+              <br/><br/>
+              <br/><br/>
+              <br/><br/>
+      </center>
+              : null}
+               {props.hide ? 
+          <Card>
+            <CardHeader className="text-center">
+              <Col xs="2">
+                <h3 className="mb-0">Ajouter Client</h3>
+              </Col>
+              <Col className="text-right" xs="4"></Col>
+            </CardHeader>
+            <CardBody className="text-center">
+              <div >
+                <h6 className="heading-small text-muted mb-4">
+                Information Client 
+                </h6>
+                <div className="pl-lg-4">
+                <Row>
+
+                <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Nom Entreprise
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Nom entreprise"
+                            type="text"
+                            name="nomComplet"
+                            value={props.nomComplet}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
   
-                    <Link to="/admin/abonnement" className="btn btn-default ">
-                      Annuler
-                    </Link>
-                  </div>
+</Row>
+ 
+                <Row>
+
+                 <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Chargé de compte
   
-                </CardBody>
-              </Card>
-          : null}
-          </Container>
-        </>
+                            </label>
+                        <Select
+                          name="chargeCompte"
+                          options={props.users.map((user)=> {
+                            return {
+                              value: user,
+                              label: user.name
+                            }
+                          })}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectUserHandler.bind(this)}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Fonction
+  
+                            </label>
+                        <Select
+                          name="fonction"
+                          options={props.fonction}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                 </Row>
+                  
+
+                  <hr className="my-4" />
+
+                  <h6 className="heading-small text-muted mb-4">
+                   Données Générales
+                  </h6>
+                  <div className="pl-lg-4"></div>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Raison Sociale
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Raison Sociale"
+                            type="text"
+                            name="raisonSociale"
+                            value={props.raisonSociale}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    
+                    
+
+            
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Multi-sites
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="multisites"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                    { props.multisite.value == "oui"?
+                  <Col lg="6">
+                  <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                        Nombre des sites
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Nombre des sites"
+                            type="number"
+                            name="nombreSite"
+                            value={props.nombreSite}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>  : null}
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Groupe de société
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="groupe"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                         Effectif
+                        </label>
+                        <Select
+                          defaultValue={EffectifOptions[1]}
+                          name="effectif"
+                          options={EffectifOptions}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <hr className="my-4" />
+
+                  <h6 className="heading-small text-muted mb-4">
+                  Contacts Principales
+                  </h6>
+                  <div className="pl-lg-4"></div>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Contact principal
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="segment"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Contact Technique
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="sousSegment"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row><Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Contact Financier
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="segment"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Contact Juridique
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="sousSegment"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <hr className="my-4" />
+
+                  <h6 className="heading-small text-muted mb-4">
+                    Information sur le compte
+                  </h6>
+                  <div className="pl-lg-4"></div>
+                  <Row>
+                  <Col lg="12">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Secteur d'activité
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Secteur d'activité"
+                            type="text"
+                            name="secteurActivite"
+                            value={props.secteurActivite}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Matricule Fiscale
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Matricule Fiscale"
+                            type="text"
+                            name="matriculeFiscale"
+                            value={props.matriculeFiscale}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Registre de commerce
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Registre de commerce"
+                            type="text"
+                            name="registreCommerce"
+                            value={props.registreCommerce}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Chiffre d'affaires annuel
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Chiffre d'affaire"
+                            type="text"
+                            name="chiffreAffaire"
+                            value={props.chiffreAffaire}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Exonération TVA
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="tva"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Exonération Timbre
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="timbre"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            Image
+                          </label>
+                          <ImageUpload
+                            ImageUpload={props.ImageUploadRecievedHandler}
+                          ></ImageUpload>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                    <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            Image
+                          </label>
+                          <ImageUpload
+                            ImageUpload={props.ImageUploadRecievedHandler}
+                          ></ImageUpload>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+
+                  <hr className="my-4" />
+
+                  <h6 className="heading-small text-muted mb-4">
+                   Coordonnées principales
+                  </h6>
+                  <div className="pl-lg-4"></div>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Rue (1)
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Rue (1)"
+                            type="text"
+                            name="rue1"
+                            value={props.rue1}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Rue (2)
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Rue (2)"
+                            type="text"
+                            name="rue2"
+                            value={props.rue2}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Gouvernerat
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="gouvernerat"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Délégation
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="delegation"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Localité
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Localité"
+                            type="text"
+                            name="localite"
+                            value={props.localite}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Code postal
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Code postal"
+                            type="text"
+                            name="codePostal"
+                            value={props.codePostal}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Ville
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Ville"
+                            type="text"
+                            name="ville"
+                            value={props.ville}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Pays/région
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Pays/Région"
+                            type="text"
+                            name="pays"
+                            value={props.pays}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Tél
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Tél"
+                            type="text"
+                            name="tel"
+                            value={props.tel}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Fax
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Fax"
+                            type="text"
+                            name="fax"
+                            value={props.fax}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         GSM
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="GSM"
+                            type="text"
+                            name="gsm"
+                            value={props.gsm}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Email (1)
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Email (1)"
+                            type="text"
+                            name="email1"
+                            value={props.email1}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Email (2)
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Email (2)"
+                            type="text"
+                            name="email2"
+                            value={props.email2}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Email (3)
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Email (3)"
+                            type="text"
+                            name="email3"
+                            value={props.email3}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Email Topnet
+                        </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder="Email Topnet"
+                            type="text"
+                            name="emailTopnet"
+                            value={props.emailTopnet}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Création nouveau email
+                        </label>
+                        <div className="radio">
+                <label>
+                  <input type="radio" value="option1" onChange={props.handleOptionChange} checked={props.selectedOption ==="oui"} />
+                  Oui
+                </label>
+              </div>
+              <div className="radio">
+                <label>
+                  <input type="radio" value="option2" onChange={props.handleOptionChange}  checked={props.selectedOption ==="non"}/>
+                  Non
+                </label>
+              </div>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  
+                </div>
+               
+                <hr className="my-4" />
+                
+              </div>
+
+            </CardBody>
+          </Card>
+      : null}
+      </Container>
+    </>
       );
     
   }
@@ -1703,13 +2049,14 @@ render() {
                                   isMulti
                                   value= {props.clientProductIdsSelected}
                                   name="clientProductIds"
-                                  options={props.clientProductIds}
+                                  options={props.products}
                                   className="basic-multi-select"
                                   classNamePrefix="select"
-                                  onChange={props.SelectProductInputHandler.bind(
-                                    this
-                                  )}
+                                  onChange={props.SelectProductInputHandler}
                                
+                                  
+
+
                                 />
 
 
@@ -1719,16 +2066,33 @@ render() {
                           </Row>
                         </div>
                         <hr className="my-4" />
-                        <Button color="primary" onClick={props.onSubmit2}>
-                          Assign
-                        </Button>
-  
-                        <Link
-                          to="/admin/client/list"
-                          className="btn btn-default "
+                  <h6 className="heading-small text-muted mb-4">
+                    choisir le débit 
+                  </h6>
+                  <div className="pl-lg-4"></div>
+                  <Row>
+                    <Col lg="12">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
                         >
-                          Cancel
-                        </Link>
+                          Débit
+                        </label>
+                        <Select
+                          defaultValue={OptionsDebit[1]}
+                          name="debit"
+                          options={OptionsDebit}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+
+                        
+
                       </div>
                     </CardBody>
                   </Collapse>
@@ -1754,135 +2118,178 @@ render() {
         <Container className="mt--6" fluid>
 
     
-<Card>
-                  <CardBody>
-                    <div className="pl-lg-4">
-                    <h6 className="heading-small text-muted mb-4">
-                    Informations sur les dates  
-                    </h6>
-                      <Row className="input-daterange datepicker align-items-center">
-                        <Col xs={12} sm={6}>
-                          <label className=" form-control-label">
-                            Start date
-                          </label>
-                          <FormGroup>
-                          <ReactDatetime
-                                id="input-date"
-                                type="date"
-                                name="startDate"
-                                value={props.startDate}
-                                //onChange={props.handleChange}
-                                onChange={e =>
-                                  props.handleReactDatetimeChange("startDate", e)
-                                }
-                                renderDay={(props1, currentDate, selectedDate) => {
-                                  let classes = props1.className;
-                                  classes += props.getClassNameReactDatetimeDays(
-                                    currentDate
-                                  );
-                                  return (
-                                    <td {...props1} className={classes}>
-                                      {currentDate.date()}
-                                    </td>
-                                  );
-                                }}
-                              />
-                          </FormGroup>
-                        </Col>
-                        <Col xs={12} sm={6}>
-                          <FormGroup>
-                            <label className=" form-control-label">
-                              End date
-                            </label>
-                            <FormGroup>
-                            <ReactDatetime
-                                id="input-date"
-                                type="date"
-                                name="endDate"
-                                value={props.endDate}
-                                onChange={e =>
-                                  props.handleReactDatetimeChange("endDate", e)
-                                }
-                                renderDay={(props1, currentDate, selectedDate) => {
-                                  let classes = props1.className;
-                                  classes += props.getClassNameReactDatetimeDays(
-                                    currentDate
-                                  );
-                                  return (
-                                    <td {...props1} className={classes}>
-                                      {currentDate.date()}
-                                    </td>
-                                  );
-                                }}
-                              />
-                          </FormGroup>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      
-                      
-                    </div>
-                  </CardBody>
-                </Card>
       
-                <Card>
-                  <CardBody>
+    <Card>
+        <CardBody>
+       
                     <div className="pl-lg-4">
                     <h6 className="heading-small text-muted mb-4">
                     Informations sur les contrats
                     </h6>
-                      
+                    <div className="pl-lg-4">
                     <Row>
+                    <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            fichier 1 recto
+                          </label>
+                          <ImageUpload
+                            ImageUpload={props.ImageUploadRecievedHandler1a}
+                          ></ImageUpload>
+                        </FormGroup>
+                      </Col>
+                      <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            fichier 1 verso
+                          </label>
+                          <ImageUpload
+                            ImageUpload={props.ImageUploadRecievedHandler1b}
+                          ></ImageUpload>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    </div>
+                    <div className="pl-lg-4">
+                    <Row>
+                    <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            fichier 2 recto
+                          </label>
+                          <ImageUpload
+                            ImageUpload={props.ImageUploadRecievedHandler2a}
+                          ></ImageUpload>
+                        </FormGroup>
+                      </Col>
 
-             < Col lg="6">
-              <FormGroup>
-               <label
-                className="form-control-label"
-                htmlFor="input-file"
-                >
-                     Fichier1
-                 </label>
-                <InputGroup
-                 className={classnames("input-group-merge")}
-                 >
-        
-                 <Input
-                  id="input-file"
-                  placeholder="fichier 1"
-                  type="file"
-                  name="fichier1"
-                  value={props.fichier1}
-                  onChange={props.handleChange}
-                />
-                </InputGroup>
-             </FormGroup>
-            </Col>
-           <Col lg="6">
-           <FormGroup>
-             <label
-                  className="form-control-label"
-                  htmlFor="input-file"
-              >
-                    Fichier2
-               </label>
-             <InputGroup
-               className={classnames("input-group-merge")}
-              >
-       
-                <Input
-                   id="input-username"
-                   placeholder="fichier 2"
-                   type="file"
-                   name="fichier2"
-                   value={props.fichier2}
-                   onChange={props.handleChange}
-                />
-             </InputGroup>
-         </FormGroup>
-         </Col>
-        </Row>
+                      <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            fichier 2 verso
+                          </label>
+                          <ImageUpload
+                            ImageUpload={props.ImageUploadRecievedHandler2b}
+                          ></ImageUpload>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    </div>
 
+                    
+                  
+                    <div className="pl-lg-4">
+                    <Row>
+                    <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            fichier 3 recto
+                          </label>
+                          <ImageUpload
+                            ImageUpload={props.ImageUploadRecievedHandler3a}
+                          ></ImageUpload>
+                        </FormGroup>
+                      </Col>
+
+                      <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-country"
+                          >
+                            {" "}
+                            fichier 3 verso
+                          </label>
+                          <ImageUpload
+                            ImageUpload={props.ImageUploadRecievedHandler3b}
+                          ></ImageUpload>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    </div>
+
+                  
+                  <div className="pl-lg-4">
+                  <Row>
+                    <Col lg="12">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                           Paiement à la réception d'une facture 
+                        </label>
+                        <Select
+                          defaultValue={OptionsPaiement[1]}
+                          name="modePaiement"
+                          options={OptionsPaiement}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={props.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  </div>
+                  <div className="pl-lg-4">
+                  <Row>
+                    <Col lg="12">
+                      <FormGroup>
+                      <label
+                          className="form-control-label"
+                          htmlFor="input-username"
+                        >
+                         Numero de telephone pour ADSL 
+                      </label>
+                        <InputGroup
+                          className={classnames("input-group-merge")}
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="ni ni-single-02" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            id="input-username"
+                            placeholder=" Numero de telephone pour ADSL"
+                            type="text"
+                            name="telADSL"
+                            value={props.telADSL}
+                            onChange={props.onChange}
+                          />
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  </div>
+
+
+
+
+                
+        <input value="Confirmer"type="button"  onClick={props.handleSubmit}/>
     </div>
+  
  </CardBody>
  </Card>
  
@@ -1891,7 +2298,6 @@ render() {
 <br/>
 
  
-<button className="btn btn-success btn-block">Confirmer </button>
 
 <br/>
 <br/>
@@ -1905,12 +2311,14 @@ render() {
   
 Abonnement.propTypes = {
     createClient: PropTypes.func.isRequired,
+    createAbonnement: PropTypes.func.isRequired,
     editClient: PropTypes.func.isRequired,
     errors: PropTypes.object.isRequired,
     getClient: PropTypes.func.isRequired,
   };
   const mapStateToProps = (state) => ({
     client: state.client,
+    abonnement: state.abonnement,
     errors: state.errors,
     products: state.products,
     countryCodes: state.countryCodes,
@@ -1924,7 +2332,7 @@ Abonnement.propTypes = {
     getClient,
     getAllProducts,
     getProductById,
-    
+    createAbonnement,
     uploadImage,
     clearErrors,
     getProductById,

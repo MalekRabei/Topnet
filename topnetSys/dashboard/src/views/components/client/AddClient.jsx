@@ -9,6 +9,7 @@ import {
   getClientByMatricule
   
 } from "../../../services/clientServices/clientActions";
+
 import { getAllProducts , getProductById} from "../../../services/productServices/productActions";
 import classnames from "classnames";
 import { Link, withRouter } from "react-router-dom";
