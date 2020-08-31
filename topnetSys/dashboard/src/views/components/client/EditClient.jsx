@@ -8,6 +8,8 @@ import {
   editClient,
   getProductsByCountryCode
 } from "../../../services/clientServices/clientActions";
+import { clearErrors } from "../../../services/errorServices/errorAction";
+
 import classnames from "classnames";
 import { Link, withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -15,7 +17,10 @@ import Select from "react-select";
 import axios from "axios";
 import io from "socket.io-client";
 import { getAllProducts, getProductById } from "../../../services/productServices/productActions";
-import CountriesData from "../../../utils/CountryData/CountriesData.json";
+
+//notifications imports
+import NotificationAlert from "react-notification-alert";
+import NotificationAlertOptions from "../../../layouts/Alerts";
 
 // reactstrap components
 import {
@@ -45,8 +50,9 @@ import SimpleHeader from "../../../components/Headers/SimpleHeader";
 
 import { uploadImage } from "../../../services/ImageServices/ImageActions";
 import ImageUpload from "../user/adding-user/ImageUpload";
-import DisplayProducts from "./ProductsByCountry/DisplayProducts"
-import Fonction from "../../../utils/fonction.json" 
+import Fonction from "../../../utils/fonction.json";
+import Adresse from "../../../utils/adresse.json";
+
 
 const Options = [
   { value: true, label: "Oui" },
@@ -80,22 +86,31 @@ class EditClient extends React.Component {
 
       nombreSite: "",
       multisite: false,
+      showNbSite:false,
       groupe: false,
       dateDebut: "",
       effectif: "",
       secteurActivite: "",
       matriculeFiscale: "",
       tva: false ,
+      showTva: false,
+      tvaFile: "",
       timbre: false  ,  
+      showTimbre:false,
+      timbreFile:"",
 
       logo: "",
       rue1: "" ,
       rue2: "" ,
       ville : "",
-      gouvernerat: "",
+      gouvernorat: "",
+      gouvernoratS:"",
       localite: "",
+      localiteS:"",
       delegation : "",
+      delegationS:"",
       codePostal: "",
+      codePostalS:"",
       tel : "",
       gsm: "",
       fax: "",
@@ -109,7 +124,10 @@ class EditClient extends React.Component {
       productIdsSelected: [],
       fonction:"",
      
-      image: {},
+      imagetva: {},
+      imageMatricule:{},
+      imageRegistre:{},
+      imageTimbre:{},
       errors: {},
       permission: {},
       showProducts: false ,
@@ -127,6 +145,7 @@ class EditClient extends React.Component {
     this.SelectClientStateInputHandler = this.SelectClientStateInputHandler(
       this
     );
+    this.getUnique = this.getUnique.bind(this);
   }
    // Fetch data from the back-end
    fetchUsers() {
@@ -141,9 +160,73 @@ class EditClient extends React.Component {
   }
 
   async componentWillMount() {
+
+    this.fetchUsers();
+    
+    //get country codes
+    const SelectDataForm = [];
+    const fonction = [...Fonction];
+    fonction.map((fct) => {
+      //country code and country name mapping to id: text:
+      return SelectDataForm.push({
+        value: fct.num,
+        label: fct.fonction + " (" + fct.num + ")",
+      });
+    });
+    this.setState({ 
+      fonction: SelectDataForm ,
+    });
+    console.log(fonction);
+
+    const gouvernoratData = [];
+    const gouvernoratS = [...Adresse];
+    gouvernoratS.map((ad)=>{
+      return gouvernoratData.push({
+        value : ad.gouvernorat,
+        label: ad.gouvernorat
+      })
+    })
+    this.setState({gouvernoratS: gouvernoratData })
+    console.log(gouvernoratS);
+
+
+    const LocaliteData = [];
+    const localiteS = [...Adresse];
+    localiteS.map((ad)=>{
+      return LocaliteData.push({
+        value : ad,
+        label: ad.localite
+      })
+    })
+    this.setState({localiteS: LocaliteData })
+    console.log(localiteS);
+
+    const delegationData = [];
+    const delegationS = [...Adresse];
+    delegationS.map((ad)=>{
+      return delegationData.push({
+        value : ad,
+        label: ad.delegation
+      })
+    })
+    this.setState({delegationS: delegationData })
+    console.log("del",delegationS);
+
+
+    const CodePostalData = [];
+    const codePostalS = [...Adresse];
+    codePostalS.map((ad)=>{
+      return CodePostalData.push({
+        value : ad,
+        label: ad.codePostal
+      })
+    })
+    this.setState({codePostalS: CodePostalData })
+    console.log(codePostalS);
+
     await this.props.getClient(this.state.id).then((response) => {
       this.setState({
-        chargeCompte: response.payload.chargeCompte,
+       chargeCompte: response.payload.chargeCompte,
         profil: response.payload.profil,
         active: response.payload.active,
         raisonSociale: response.payload.raisonSociale,
@@ -158,7 +241,9 @@ class EditClient extends React.Component {
         registreCommerce : response.payload.registreCommerce,
         chiffreAffaire : response.payload.chiffreAffaire,
         tva: response.payload.tva,
+        tvaFile: response.payload.tvaFile,
         timbre: response.payload.timbre,
+        timbreFile: response.payload.timbreFile,
         logo: response.payload.logo,
 
          rue1: response.payload.rue1,
@@ -184,8 +269,7 @@ class EditClient extends React.Component {
       });
     });
 
-    //get product from db
-    //await this.props.getAllProducts();
+
   }
  //user 
  SelectUserHandler= (selectedOptions)=> {
@@ -199,12 +283,17 @@ class EditClient extends React.Component {
     this.setState({ profil: fonction.value });
 
   };
-  //OnChange Select Country Handler
-  SelectMultisiteHandler = (selectedOptions) => {
-    const multi = selectedOptions;
-    this.setState({ multisite: multi.value });
+//OnChange Select Country Handler
+SelectMultisiteHandler = (selectedOptions) => {
+  const multi = selectedOptions;
+  this.setState({ multisite: multi.value });
+  if(multi.value=== true){
+    this.setState({showNbSite: true})
+  }else {
+    this.setState({showNbSite: false})
 
-  };
+  }
+}
   //OnChange Select Country Handler
   SelectGroupeHandler = (selectedOptions) => {
     const groupe= selectedOptions;
@@ -221,6 +310,12 @@ class EditClient extends React.Component {
   SelectTvaHandler = (selectedOptions) => {
     const tva = selectedOptions;
     this.setState({ tva: tva.value });
+    if(tva.value=== true){
+      this.setState({showTva: true})
+    }else{
+      this.setState({showTva: false})
+
+    }
 
   };
 
@@ -228,6 +323,12 @@ class EditClient extends React.Component {
   SelectTimbreHandler = (selectedOptions) => {
     const timbre = selectedOptions;
     this.setState({ timbre: timbre.value });
+    if(timbre.value=== true){
+      this.setState({ showTimbre: true});
+    }else {
+      this.setState({ showTimbre: false});
+
+    }
 
   };
 
@@ -240,19 +341,19 @@ class EditClient extends React.Component {
       //OnChange Select Country Handler
   SelectDelegationHandler = (selectedOptions) => {
     const del = selectedOptions;
-    this.setState({ delegation: del.value });
+    this.setState({ delegation: del.value.delegation });
 
   };
     //OnChange Select Country Handler
     SelectLocaliteHandler = (selectedOptions) => {
       const localite = selectedOptions;
-      this.setState({ localite: localite.value });
+      this.setState({ localite: localite.value.localite });
   
     };
       //OnChange Select Country Handler
   SelectCodePostalHandler = (selectedOptions) => {
     const codePostal = selectedOptions;
-    this.setState({ codePostal: codePostal.value });
+    this.setState({ codePostal: codePostal.value.codePostal });
 
   };
 
@@ -276,19 +377,96 @@ class EditClient extends React.Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.errors) {
-      this.setState({ errors: nextProps.errors });
-    }
-    if (nextProps.client) {
-      this.setState({
-        client: nextProps.client
-      });
-    }
 
-    //To receive user permission
-    if (nextProps.permission) {
-      console.log("permission ", nextProps.permission);
-      this.setState({ permission: nextProps.permission });
+  //fonction
+  if (this.state.fonction) {
+    const mappedclientfonction = this.state.fonction.map(
+      (fct) => {
+        return {
+          value: fct.value,
+          label: fct.label,
+        };
+      }
+    );
+    this.setState({ profil: mappedclientfonction });
+  }
+
+  //gouvernorat
+  if (this.state.gouvernoratS) {
+    const mappedGouv = this.state.gouvernoratS.map(
+      (ad) => {
+        return {
+          value: ad.value,
+          label: ad.label,
+        };
+      }
+    );
+    this.setState({ gouvernorat: mappedGouv });
+  }
+  //delegation
+  if (this.state.delegationS) {
+    const mappedDel = this.state.delegationS.map(
+      (ad) => {
+        return {
+          value: ad.value,
+          label: ad.label,
+        };
+      }
+    );
+    this.setState({ delegation: mappedDel });
+  }
+  ///localite
+  if (this.state.localiteS) {
+    const mappedLoc = this.state.localiteS.map(
+      (ad) => {
+        return {
+          value: ad.value,
+          label: ad.label,
+        };
+      }
+    );
+    this.setState({ localite: mappedLoc });
+  }
+  //code postal
+  if (this.state.codePostalS) {
+    const mappedCP = this.state.codePostalS.map(
+      (ad) => {
+        return {
+          value: ad.value,
+          label: ad.label,
+        };
+      }
+    );
+    this.setState({ codePostal: mappedCP });
+}
+
+   // in case of invalid inputs => getting errors
+   if (nextProps.errors) {
+    //invalid credentials => show error alert with error
+    if (nextProps.errors.errors) {
+      //  let validation = this.state.validation;
+      //  nextProps.errors.errors.map((value, index) => {
+      //   if (value.value === "") {
+      //    validation[value.param] = false;
+      //   }
+      //  this.setState({ validation: validation });
+      // });WW
+
+      this.refs.notify.notificationAlert(
+        NotificationAlertOptions(
+          "danger",
+          "Error",
+          nextProps.errors.errors[0].msg
+        )
+      );
+      //clear errors
+      this.props.clearErrors();
+    }
+  }
+    if (nextProps.client) {
+        this.setState({
+          client: nextProps.client
+        });
     }
   }
 
@@ -306,34 +484,80 @@ class EditClient extends React.Component {
     this.setState({ clientProductIdsSelected: clientProductIds });
   };
 
-  //OnChange Select Country Handler
-  SelectCounrtyHandler = (selectedOptions) => {
-    const clientCountryCode = selectedOptions;
-    this.setState({ clientCountryCodeSelected: clientCountryCode });
-    console.log("selected country code ", clientCountryCode.value )
-    this.props.getProductsByCountryCode(clientCountryCode.value);
-    this.setState({clientProductIdsSelected:[], showProducts: true})
-    this.props.getProductsByCountryCode(clientCountryCode.value);
 
-
+  ImageTVAUploadRecievedHandler = (img) => {
+    this.setState({ imagetva: img });
   };
-
-  ImageUploadRecievedHandler = (img) => {
-    this.setState({ clientLogo: img });
+  ImageTimbreUploadRecievedHandler = (img) => {
+    this.setState({ imageTimbre: img });
   };
+  ImageRegistreUploadRecievedHandler = (img) => {
+    this.setState({ imageRegistre: img });
+  };
+  ImageMatriculeUploadRecievedHandler = (img) => {
+    this.setState({ imageMatricule: img });
+  };
+  getUnique(arr, index) {
+
+    const unique = arr
+         .map(e => e[index])
+  
+         // store the keys of the unique objects
+         .map((e, i, final) => final.indexOf(e) === i && i)
+  
+         // eliminate the dead keys & store unique objects
+        .filter(e => arr[e]).map(e => arr[e]);      
+  
+     return unique;
+  }
 
   onSubmit(e) {
     e.preventDefault();
-    if (this.state.image.name !== undefined) {
-      /* if user avatar selected */
+    if (this.state.imagetva.name !== undefined) {
+      /*  */
       let path_to_upload = "clients"; // $ /
-      let imageName = this.state.image.name.toLowerCase().split(" ").join("-");
-      this.state.clientLogo =
+      let imageName = this.state.imagetva.name.toLowerCase().split(" ").join("-");
+      this.state.tvaFile =
         path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
       const formData = new FormData();
-      formData.append("img", this.state.image);
+
+      formData.append("img", this.state.imagetva);
       this.props.uploadImage(formData, path_to_upload);
     }
+    if (this.state.imageTimbre.name !== undefined) {
+      /*  */
+      let path_to_upload = "clients"; // $ /
+      let imageName = this.state.imageTimbre.name.toLowerCase().split(" ").join("-");
+      this.state.timbreFile =
+        path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+      const formData = new FormData();
+
+      formData.append("img", this.state.imageTimbre);
+      this.props.uploadImage(formData, path_to_upload);
+    }
+    if (this.state.imageMatricule.name !== undefined) {
+      /*  */
+      let path_to_upload = "clients"; // $ /
+      let imageName = this.state.imageMatricule.name.toLowerCase().split(" ").join("-");
+      this.state.matriculeFiscale =
+        path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+      const formData = new FormData();
+
+      formData.append("img", this.state.imageMatricule);
+      this.props.uploadImage(formData, path_to_upload);
+    }
+    if (this.state.imageRegistre.name !== undefined) {
+      /*  */
+      let path_to_upload = "clients"; // $ /
+      let imageName = this.state.imageRegistre.name.toLowerCase().split(" ").join("-");
+      this.state.registreCommerce =
+        path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+      const formData = new FormData();
+
+      formData.append("img", this.state.imageRegistre);
+      this.props.uploadImage(formData, path_to_upload);
+    }
+
     const clientData = {
       chargeCompte: this.state.chargeCompte,
         profil: this.state.profil,        
@@ -372,7 +596,8 @@ class EditClient extends React.Component {
     this.props.editClient(this.state.id, clientData, this.props.history);
   }
   render() {
-    console.log("state", this.state);
+    console.log(this.state)
+    console.log(this.getUnique(this.state.gouvernoratS,'label'))
 
     return (
       <>
@@ -436,6 +661,17 @@ class EditClient extends React.Component {
     
                               </label>
                           <Select
+                           value={
+                            this.state.users.map((user)=> {
+                              return {
+                                value: user,
+                                label: user.name
+                              }
+                            }).filter(
+                              (obj) => obj.label === this.state.chargeCompte.label
+                            )[0]
+                            
+                          }
                             name="chargeCompte"
                             options={this.state.users.map((user)=> {
                               return {
@@ -459,6 +695,11 @@ class EditClient extends React.Component {
     
                               </label>
                           <Select
+                        value={
+                          this.state.fonction.filter(
+                            (obj) => obj.value === parseInt(this.state.profil)
+                          )[0] }
+
                             name="profil"
                             options={this.state.fonction}
                             className="basic-multi-select"
@@ -519,7 +760,10 @@ class EditClient extends React.Component {
                             Multi-sites
                           </label>
                           <Select
-                            defaultValue={Options[1]}
+                            value={
+                              Options.filter(
+                                (obj) => obj.value ===this.state.multisite
+                              )[0] }
                             name="multisites"
                             options={Options}
                             className="basic-multi-select"
@@ -528,7 +772,7 @@ class EditClient extends React.Component {
                           />
                         </FormGroup>
                       </Col>
-                      { this.state.multisite.value == "oui"?
+                      { this.state.showNbSite?
                     <Col lg="6">
                     <FormGroup>
                           <label
@@ -567,7 +811,10 @@ class EditClient extends React.Component {
                             Groupe de société
                           </label>
                           <Select
-                            defaultValue={Options[1]}
+                            value={
+                              Options.filter(
+                                (obj) => obj.value ===this.state.groupe
+                              )[0] }
                             name="groupe"
                             options={Options}
                             className="basic-multi-select"
@@ -585,7 +832,10 @@ class EditClient extends React.Component {
                            Effectif
                           </label>
                           <Select
-                            defaultValue={EffectifOptions[1]}
+                            value={
+                              Options.filter(
+                                (obj) => obj.value ===this.state.effectif
+                              )[0] }
                             name="effectif"
                             options={EffectifOptions}
                             className="basic-multi-select"
@@ -598,85 +848,101 @@ class EditClient extends React.Component {
                     <hr className="my-4" />
 
                     <h6 className="heading-small text-muted mb-4">
-                    Contacts Principales
+                    Contacts
                     </h6>
                     <div className="pl-lg-4"></div>
-                    <Row>
-                    <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Contact principal
-                          </label>
-                          <Select
-                            defaultValue={Options[1]}
-                            name="segment"
-                            options={Options}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
-                          />
-                        </FormGroup>
-                      </Col>
-                    <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Contact Technique
-                          </label>
-                          <Select
-                            defaultValue={Options[1]}
-                            name="sousSegment"
-                            options={Options}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row><Row>
-                    <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Contact Financier
-                          </label>
-                          <Select
-                            defaultValue={Options[1]}
-                            name="segment"
-                            options={Options}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
-                          />
-                        </FormGroup>
-                      </Col>
-                    <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Contact Juridique
-                          </label>
-                          <Select
-                            defaultValue={Options[1]}
-                            name="sousSegment"
-                            options={Options}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            onChange={this.SelectInputHandler}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <hr className="my-4" />
+
+                    <Button
+                  className="btn-round btn-icon"
+                  href="#pablo"
+                  id="tooltip443412080"
+                  size="bg"
+                  color="default"
+                  to={`/admin/add-client-contact`}
+                  tag={Link}
+                >
+                  
+                  <span className="btn-inner--icon mr-1">
+                    <i className="ni ni-single-copy-04" />
+                  </span>
+                  <span className="btn-inner--text">Ajouter Les Contacts</span>
+                </Button>
+                <Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Contact principal
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="segment"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={this.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Contact Technique
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="sousSegment"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={this.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row><Row>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Contact Financier
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="segment"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={this.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  <Col lg="6">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Contact Juridique
+                        </label>
+                        <Select
+                          defaultValue={Options[1]}
+                          name="sousSegment"
+                          options={Options}
+                          className="basic-multi-select"
+                          classNamePrefix="select"
+                          onChange={this.SelectInputHandler}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                   <hr className="my-4" />
 
                     <h6 className="heading-small text-muted mb-4">
                       Information sur le compte
@@ -741,32 +1007,23 @@ class EditClient extends React.Component {
                         </FormGroup>
                       </Col>
                       <Col lg="6">
+                       
+                          
                         <FormGroup>
                           <label
                             className="form-control-label"
-                            htmlFor="input-username"
+                            htmlFor="input-country"
                           >
-                           Registre de commerce
+                            {" "}
+                            Registre de commerce
                           </label>
-                          <InputGroup
-                            className={classnames("input-group-merge")}
-                          >
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="ni ni-single-02" />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <Input
-                              id="input-username"
-                              placeholder="Registre de commerce"
-                              type="text"
-                              name="registreCommerce"
-                              value={this.state.registreCommerce}
-                              onChange={this.onChange}
-                            />
-                          </InputGroup>
+                          <ImageUpload
+                            ImageUpload={this.ImageRegistreUploadRecievedHandler}
+                            image={this.state.registreCommerce}
+
+                          ></ImageUpload>
                         </FormGroup>
-                      </Col>
+                        </Col>
                     </Row>
                     <Row>
                     <Col lg="6">
@@ -807,7 +1064,10 @@ class EditClient extends React.Component {
                             Exonération TVA
                           </label>
                           <Select
-                            defaultValue={Options[1]}
+                           value={
+                            Options.filter(
+                              (obj) => obj.value ===this.state.tva
+                            )[0] }
                             name="tva"
                             options={Options}
                             className="basic-multi-select"
@@ -825,7 +1085,10 @@ class EditClient extends React.Component {
                             Exonération Timbre
                           </label>
                           <Select
-                            defaultValue={Options[1]}
+                            value={
+                              Options.filter(
+                                (obj) => obj.value ===this.state.timbre
+                              )[0] }
                             name="timbre"
                             options={Options}
                             className="basic-multi-select"
@@ -835,8 +1098,10 @@ class EditClient extends React.Component {
                         </FormGroup>
                       </Col>
                     </Row>
+
                     <Row>
-                    <Col lg="12">
+                    { this.state.showTva ?
+                    <Col lg="6">
                         <FormGroup>
                           <label
                             className="form-control-label"
@@ -846,13 +1111,15 @@ class EditClient extends React.Component {
                             Image
                           </label>
                           <ImageUpload
-                            ImageUpload={this.ImageUploadRecievedHandler}
+                            ImageUpload={this.ImageTVAUploadRecievedHandler}
+                            image={this.state.tvaFile}
+
                           ></ImageUpload>
                         </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                    <Col lg="12">
+                      </Col> : null}
+                      { this.state.showTimbre ?
+
+                    <Col lg="6">
                         <FormGroup>
                           <label
                             className="form-control-label"
@@ -862,11 +1129,13 @@ class EditClient extends React.Component {
                             Image
                           </label>
                           <ImageUpload
-                            ImageUpload={this.ImageUploadRecievedHandler}
+                            ImageUpload={this.ImageTimbreUploadRecievedHandler}
+                            image={this.state.timbreFile}
+
                           ></ImageUpload>
                         </FormGroup>
-                      </Col>
-                    </Row>
+                      </Col> : null }
+                    </Row> 
 
                     <hr className="my-4" />
 
@@ -940,9 +1209,12 @@ class EditClient extends React.Component {
                             gouvernorat
                           </label>
                           <Select
-                           isMulti
+                           value={
+                            this.state.gouvernoratS.filter(
+                              (obj) => obj.value ===this.state.gouvernorat
+                            )[0] }
                             name="gouvernorat"
-                            options={this.state.gouvernoratS}
+                            options={this.getUnique(this.state.gouvernoratS,'label')}
                             className="basic-multi-select"
                             classNamePrefix="select"
                             onChange={this.SelectgouvernoratHandler.bind(this)}
@@ -958,8 +1230,14 @@ class EditClient extends React.Component {
                             Délégation
                           </label>
                           <Select
+                           value={
+                            this.state.delegationS.filter(
+                              (obj) => obj.label ===this.state.delegation
+                            )[0] }
                             name="delegation"
-                            options={this.state.delegationS}
+                            options={this.getUnique(this.state.delegationS.filter((del)=>
+                              del.value.gouvernorat === this.state.gouvernorat
+                            ),'label')}
                             className="basic-multi-select"
                             classNamePrefix="select"
                             onChange={this.SelectDelegationHandler.bind(this)}
@@ -978,9 +1256,15 @@ class EditClient extends React.Component {
                           </label>
                           
                           <Select
-                           isMulti
-                            name="gouvernorat"
-                            options={this.state.localiteS}
+                           value={
+                            this.state.localiteS.filter(
+                              (obj) => obj.label ===this.state.localite
+                            )[0] }
+                            name="localite"
+                            options={this.state.localiteS.filter((del)=>
+                              del.value.gouvernorat === this.state.gouvernorat
+                              && del.value.delegation === this.state.delegation
+                            )}
                             className="basic-multi-select"
                             classNamePrefix="select"
                             onChange={this.SelectLocaliteHandler.bind(this)}
@@ -997,9 +1281,16 @@ class EditClient extends React.Component {
                            Code postal
                           </label>
                           <Select
-                           isMulti
-                            name="gouvernorat"
-                            options={this.state.codePostalS}
+                            value={
+                              this.state.codePostalS.filter(
+                                (obj) => obj.label ===this.state.codePostal
+                              )[0] }
+                            name="codePostal"
+                            options={this.state.codePostalS.filter((del)=>
+                              del.value.gouvernorat === this.state.gouvernorat
+                              && del.value.delegation === this.state.delegation
+                              && del.value.localite === this.state.localite
+                            )}
                             className="basic-multi-select"
                             classNamePrefix="select"
                             onChange={this.SelectCodePostalHandler.bind(this)}
@@ -1287,7 +1578,7 @@ class EditClient extends React.Component {
                  
                   <hr className="my-4" />
                   <Button color="primary" onClick={this.onSubmit}>
-                    Modifier
+                    Ajouter
                   </Button>
 
                   <Link to="/admin/clients" className="btn btn-default ">
@@ -1326,5 +1617,6 @@ export default connect(mapStateToProps, {
   editClient,
   uploadImage,
   getProductById,
-  getProductsByCountryCode
+  getProductsByCountryCode,
+  clearErrors
 })(EditClient);

@@ -97,7 +97,7 @@ class ErrorPage extends React.Component {
                   <br/>
                  
             </div>
-    <h4 style={{"color" : "white"}} className="text-center">404</h4>
+    <h4 style={{"color" : "white"}} className="text-center">Il faut vous connecter ! </h4>
             <Container className="pt-lg-7">
            
               <Row className="justify-content-center">
@@ -124,7 +124,7 @@ class ErrorPage extends React.Component {
                     <Col md={{size:6 ,offset:3}}>
                       <a
                         className="text-white text-center"
-                        href="/admin/index"
+                        href="/auth/login"
                         
                       >
                         <h4 className="text-white">Retour</h4>

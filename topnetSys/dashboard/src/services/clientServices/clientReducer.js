@@ -6,7 +6,10 @@ import {
    GET_ALL_CLIENTS ,
    UPDATING_CLIENT ,
    CLEAR_MESSAGE,
+   ADD_CONTACT,
+   DELETE_CONTACT,
  GET_PRODUCTS_BY_COUNTRYCODE,
+ GET_ALL_CONTACTS
       
   } from './types';
   
@@ -17,7 +20,9 @@ import {
     client : {} ,
     errors : {}, 
     products_country_code: [],
-    message: ""
+    message: "",
+    contact: {},
+    contacts: []
   };
 
   const FETCH_CLIENTS_PENDING = "FETCH_CLIENTS_PENDING";
@@ -84,6 +89,21 @@ import {
           products_country_code: action.payload,
           loading: false,
         };
+        case ADD_CONTACT:
+        return {
+          ...state,
+          message:action.payload.msg,
+        };
+        case GET_ALL_CONTACTS:
+        return {
+          ...state,
+          contacts : action.payload,
+          message:action.payload.msg,
+        };
+        case DELETE_CONTACT:
+      return {
+        ...state,
+      };
       default:
         return state;
     }

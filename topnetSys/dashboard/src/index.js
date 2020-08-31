@@ -76,14 +76,11 @@ ReactDOM.render(
     <Route path="/admin"
        render={props => localStorage.jwtToken ? (
        <AdminLayout {...props} />) : (
-        <Redirect to="/admin/index" />
-      ) } 
+        <Route path="/" render={props =><ErrorLayout {...props}/> } />
+        ) } 
       />
     <Route path="/auth" render={props => <AuthLayout  {...props} />} />
-    
-    <Redirect from="*" to="/auth/login" />
-
-    <Route path="/" render={props =><ErrorLayout {...props}/> } />
+    <Route path="/404" render={props =><ErrorLayout {...props}/> } />
     </Switch>
   </BrowserRouter>
   </Provider>,

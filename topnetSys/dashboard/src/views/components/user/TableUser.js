@@ -91,17 +91,7 @@ this.setState({users:users});
       <p>Not full access</p>
      )} </Label><br/> </React.Fragment>))}
   </Table.Cell>*/}
-          <Table.Cell>
-            <ModalPermission
-              headerTitle="View Permission"
-              buttonTriggerTitle="Permission"
-              buttonColor="green"
-              user={user}
-              userid={user._id}
-              server={this.props.server}
-              socket={this.props.socket}
-            />
-          </Table.Cell>
+          
 
           <Table.Cell>
             <Col>
@@ -117,12 +107,7 @@ this.setState({users:users});
                 socket={this.props.socket}
               />
               {/* This will be updated for the permission */}
-              <Link
-                to={"/admin/update-permission/" + user._id}
-                className="btn-sm btn-outline-success mr-1 float-left"
-              >
-                Edit permission
-              </Link>
+             
 
               <ModalConfirmDelete
                 headerTitle="Delete User"
@@ -171,7 +156,6 @@ this.setState({users:users});
             <Table.HeaderCell>Role</Table.HeaderCell>
             <Table.HeaderCell>Address</Table.HeaderCell>
             <Table.HeaderCell>Enabled</Table.HeaderCell>
-            <Table.HeaderCell>Permissions</Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
             <Table.HeaderCell></Table.HeaderCell>
           </Table.Row>

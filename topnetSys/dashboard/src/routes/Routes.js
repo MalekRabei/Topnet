@@ -33,6 +33,7 @@ import Clients from "../views/components/client/ListClient"
 import AddClient from "../views/components/client/AddClient"
 import Assign from "../views/components/client/Assign"
 import UpdateClient from '../views/components/client/EditClient'
+import Contact from '../views/components/client/Contact'
 
 
 //product 
@@ -84,7 +85,7 @@ export const routes_admin = [
   {
     collapse: true,
     path: "/users",
-    name: "Users",
+    name: "Utilisateurs",
     icon: "ni ni-circle-08 text-primary",
     state: "UserCollapse",
 
@@ -92,9 +93,10 @@ export const routes_admin = [
     {path: "/users",
     component: Users,
     layout: "/admin",
-    name: "Users" },
+    name: "Utilisateurs" }, 
+
     { path: "/addUser",
-      name: "Adding user",
+      name: "Ajout Utilisateur",
       component: AddUserContainer,
       layout: "/admin" },
     ]
@@ -112,13 +114,19 @@ export const routes_admin = [
     state: "ClientCollapse",
     views:[
       { path: "/clients",
-      name: "List",
+      name: "Liste clients",
       component: Clients,
       layout: "/admin",},
       {
         path: "/add-client",
-        name: "Add Client",
+        name: "Ajout Client",
         component: AddClient,
+        layout: "/admin"
+      },
+      {
+        path: "/add-client-contact",
+        name: "Ajout Contact",
+        component: Contact,
         layout: "/admin"
       },
       {
@@ -167,7 +175,7 @@ export const routes_admin = [
 
   { collapse:true,
     path: "/product",
-    name: "Products",
+    name: "Produits",
     icon: "ni ni-cart text-red",
     component: Product,
     layout: "/admin",
@@ -237,7 +245,7 @@ export const routes_admin = [
  
   {
     path: "/user-profile",
-    name: "User Profile",
+    name: "Profil ",
     icon: "ni ni-single-02 text-blue",
     component: Profile,
     layout: "/admin",
@@ -273,7 +281,7 @@ export const routes_auth=[
   },
   {
     path: "/user-profile",
-    name: "User Profile",
+    name: "Profil",
     icon: "ni ni-single-02 text-blue",
     component: Profile,
     layout: "/admin",
@@ -299,7 +307,7 @@ export const routes_auth=[
 export const routes_agent_dme=[
   {
     path: "/user-profile",
-    name: "User Profile",
+    name: " Profil",
     icon: "ni ni-single-02 text-blue",
     component: Profile,
     layout: "/admin",
@@ -375,7 +383,7 @@ export const routes_agent_dme=[
 export const routes_agent=[
   {
     path: "/user-profile",
-    name: "User Profile",
+    name: "Profil",
     icon: "ni ni-single-02 text-blue",
     component: Profile,
     layout: "/admin",

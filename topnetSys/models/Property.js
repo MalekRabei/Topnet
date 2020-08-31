@@ -5,6 +5,9 @@ const PropertySchema = new mongoose.Schema({
     required: true,
   }
   
+},{
+  versionkey: false,
+  timestamps: true
 });
 
 module.exports = Property = mongoose.model("property", PropertySchema);

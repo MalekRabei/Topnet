@@ -490,19 +490,6 @@ class Assign extends React.Component {
               <CardHeader className="bg-transparent">
                 <h3 className="mb-0">Produits du client </h3>
               </CardHeader>
-              <Table className="align-items-center table-flush" responsive>
-                <thead className="thead-light">
-                  <tr>
-                  <th>Retour</th>
-                  
-                    <th>Client</th>
-                    <th>Mis à jour le</th>
-                    <th>Produits</th>
-                    
-                    
-                  </tr>
-                </thead>
-               </Table>
                <ToolkitProvider
                   data={dataTable}
                   keyField="name"

@@ -4,6 +4,8 @@ import {
     ADD_ABONNEMENT ,
     GET_ERRORS,
     CLEAR_MESSAGE,
+    VALIDER_ETAT,
+    REJETER_ETAT
    } from './types';
 
    export const clearMessage = () => (dispatch) => {
@@ -32,4 +34,39 @@ export const createAbonnement = (abonnementData, history) => dispatch => {
 };
 
 
+/****************************************Gestion etat abonnement */
+//VALIDER
+export const validerEtat = (id) => (dispatch) => {
+  axios
+    .post(`/api/abonnements/valider/${id}`)
+    .then((res) => {
+      dispatch({
+        type: VALIDER_ETAT,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: null,
+      })
+    );
+};
 
+//REJETER
+export const rejeterEtat = (id) => (dispatch) => {
+  axios
+    .post(`/api/abonnements/rejeter/${id}`)
+    .then((res) => {
+      dispatch({
+        type: REJETER_ETAT,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: null,
+      })
+    );
+};

@@ -6,7 +6,7 @@ class ImageUpload extends Component {
     console.log("constructor ", this.props);
     this.state = {
       Img: null,
-      imgSrc: null,
+      imgSrc: 1,
     };
     this.onFileChange = this.onFileChange.bind(this);
   }
@@ -34,6 +34,13 @@ class ImageUpload extends Component {
 
   componentWillReceiveProps(nextprops) {
     if (nextprops.image && this.state.Img === null) {
+      console.log("nextprops.image", nextprops.image, "file", this.state);
+      this.setState({
+        imgSrc: process.env.PUBLIC_URL + "/Images/" + nextprops.image,
+      });
+    }
+
+    if (nextprops.imgSrc && this.state.Img === null) {
       console.log("nextprops.image", nextprops.image, "file", this.state);
       this.setState({
         imgSrc: process.env.PUBLIC_URL + "/Images/" + nextprops.image,
@@ -79,7 +86,7 @@ class ImageUpload extends Component {
         <br></br>
         <div className="form-group">
           <label
-            htmlFor="Imgupload"
+            htmlFor={this.state.imgSrc}
             className={
               "btn " +
               (labelText === "Select image"
@@ -91,9 +98,10 @@ class ImageUpload extends Component {
             {labelText}
           </label>
 
+
           <input
             ref="file"
-            id="Imgupload"
+            id={this.state.imgSrc}
             style={{ display: "none" }}
             type="file"
             name="Imgupload"

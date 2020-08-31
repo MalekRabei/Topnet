@@ -12,6 +12,9 @@ const ProductPropertiesSchema = new mongoose.Schema({
   },
   path: { type: String, required: true },
   properties: { type: Array, required: false },
+},{
+  versionkey: false,
+  timestamps: true
 });
 
 module.exports = ProductProperties = mongoose.model(

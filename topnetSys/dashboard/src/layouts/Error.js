@@ -77,19 +77,18 @@ class Error extends React.Component {
               <span />
               <span />
               <span />
-              <br/>
-                  <br/>
-                  <br/>
+             
+                  
                  
             </div>
-    <h4 style={{"color" : "white"}} className="text-center">404</h4>
+    <h2 style={{"color" : "white"}} className="text-center">Il faut vous connecter ! </h2>
             <Container className="pt-lg-7">
            
               <Row className="justify-content-center">
                 <Col lg="8">
                 <Container>
               <Row className="row-grid align-items-center">
-                <Col >
+                <Col  md={{size:8 ,offset:2}} >
                   <img
                     alt="..."
                     className="img-fluid floating"
@@ -103,13 +102,14 @@ class Error extends React.Component {
             </Container>
            
                     
-           
-            
+           <br/>
+           <br/>
+           <br/>
                   <Row className="mt-3">
                     <Col md={{size:6 ,offset:3}}>
                       <a
                         className="text-white text-center"
-                        href="/admin/index"
+                        href="/auth/login"
                         
                       >
                         <h4 className="text-white">Retour</h4>

@@ -109,11 +109,7 @@ let clients = this.props.clients;
           text: "Chargé du Compte",
           sort: true,
         },
-        {
-          dataField: "active.value",
-          text: "Etat du Compte",
-          sort: true,
-        },
+        
       
         {
           dataField: "link",

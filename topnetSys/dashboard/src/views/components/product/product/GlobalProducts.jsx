@@ -98,7 +98,7 @@ class GlobalProducts extends React.Component {
     }
     //product added => get success message
     if (nextProps.products.message) {
-      if (nextProps.products.message !== "") {
+      if (nextProps.products.message) {
         // success notification
         this.refs.notify.notificationAlert(
           NotificationAlertOptions(

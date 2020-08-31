@@ -18,13 +18,14 @@ const productPropertiesApi = require('./routes/api/productPropertiesApi');
 const property = require("./routes/api/propertyApi");
 const clients = require('./routes/api/clientApi');
 const abonnement = require('./routes/api/abonnementApi');
+const contact = require('./routes/api/contactApi');
 
 
 
 
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({limit: '50mb', extended: true }));
+app.use(bodyParser.urlencoded({ limit: '50mb',extended: true }));
 
 // DB Config
 const db = require('./config/keys').mongoURI;
@@ -55,6 +56,8 @@ app.use('/api/category', categories);
 app.use('/api/productproperties', productPropertiesApi);
 app.use("/api/property", property);
 app.use("/api/abonnements", abonnement);
+app.use("/api/contact",contact);
+
 
 
 app.use(express.urlencoded({ extended: true }));

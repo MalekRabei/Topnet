@@ -12,10 +12,16 @@ const ClientSchema = new mongoose.Schema({
     effectif:{type:String},
     secteurActivite:{type:String},
     registreCommerce:{type:String},
+
     matriculeFiscale:{type:String},
+
     chiffreAffaire : {type: String},
     tva:{type:Boolean},
+    tvaFile:{type:String},
+
     timbre:{type:Boolean},
+    timbreFile:{type:String},
+
     //coordonnée principale 
     ///adresse
     rue1:{type:String},
@@ -43,7 +49,7 @@ const ClientSchema = new mongoose.Schema({
     },
     contact:[
         {type:Object,
-        ref: "user"}
+        ref: "contact"}
     ],
     products: [
         {

@@ -1,8 +1,9 @@
 import {
    ADD_ABONNEMENT ,
-   
+   vALIDER_ETAT,
    CLEAR_MESSAGE,
-
+   REJETER_ETAT,
+   VALIDER_ETAT
       
   } from './types';
   
@@ -80,6 +81,20 @@ import {
           products_country_code: action.payload,
           loading: false,
         };
+        case VALIDER_ETAT:
+            // console.log( action.payload.name);
+             return {
+               ...state,
+               loading: false,
+               message:action.payload.msg,
+             };
+      case REJETER_ETAT:
+    // console.log( action.payload.name);
+      return {
+        ...state,
+        loading: false,
+        message:action.payload.msg,
+             };
       default:
         return state;
     }

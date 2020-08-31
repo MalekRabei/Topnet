@@ -34,7 +34,7 @@ class ModalConfirmDelete extends Component {
         onClick={this.handleOpen}
         className={this.props.className}
         color={this.props.buttonColor}
-        id="tooltip443412080">
+        id="tooltip4434120803">
            <span className="btn-inner--icon mr-1">
                     <i className="ni ni-zoom-split-in" />
                   </span>

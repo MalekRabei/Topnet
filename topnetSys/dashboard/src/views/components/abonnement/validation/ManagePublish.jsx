@@ -40,6 +40,8 @@ import paginationFactory from "react-bootstrap-table2-paginator";
 import BootstrapTable from "react-bootstrap-table-next";
 // react plugin that prints a given react component
 import ReactToPrint from "react-to-print";
+//ACTIONS
+import {validerEtat, rejeterEtat} from '../../../../services/abonnementServices/abonnementActions';
 
 
 const { SearchBar } = Search;
@@ -83,6 +85,8 @@ class ManagePublish extends React.Component {
       openedCollapses: ["collapseTwo"],
     };
     this.fetchAbonnement= this.fetchAbonnement.bind(this);
+    this.onClickRejeter= this.onClickRejeter.bind(this);
+    this.onClickValider= this.onClickValider.bind(this);
   }
   collapsesToggle = (collapse) => {
     let openedCollapses = this.state.openedCollapses;
@@ -100,14 +104,19 @@ class ManagePublish extends React.Component {
     this._isMounted = true;
     this.fetchAbonnement();
   }
-  onClick(id) {
-   // this.props.addPendingAbonnement(id);
-        window.location.reload(false);
+  onClickValider(id) {
+    this.props.validerEtat(id);
+    window.location.reload(false);
+
+  }
+  onClickRejeter(id) {
+    this.props.rejeterEtat(id);
+    window.location.reload(false);
 
   }
   fetchAbonnement(){
     axios
-    .get(`${this.server}/api/abonnements/list`)
+    .get(`${this.server}/api/abonnements/listedattente`)
     .then((response) => {
       this.setState({ abonnements: response.data });
     })
@@ -159,9 +168,11 @@ class ManagePublish extends React.Component {
                     },
                     
                     {
-                      dataField: "etat ",
+                      dataField: "etat.toString() ",
                       text: "Etat ",
-                      sort: true
+                      sort: true,
+                      accessor: d => { return d.etat ? 'Oui' : 'Non' },
+
                     },
                     {
                       dataField: "fichier1recto",
@@ -179,12 +190,10 @@ class ManagePublish extends React.Component {
                             <Button
                               className="btn-round btn-icon"
                               href="#pablo"
-                              id="tooltip443412080"
-                              //onClick={(e) => this.showUpdate(e, row)}
+                              id="tooltip4434120801"
+                              onClick={(e) => this.onClickValider(row._id)}
                               size="sm"
                               color="primary"
-                             // to={`/admin/update-client/${row._id}`}
-                              tag={Link}
                             >
                               <span className="btn-inner--icon mr-1">
                                 <i className="ni ni-settings-gear-65" />
@@ -194,12 +203,10 @@ class ManagePublish extends React.Component {
                             <Button
                               className="btn-round btn-icon"
                               href="#pablo"
-                              id="tooltip443412080"
-                              //onClick={(e) => this.showUpdate(e, row)}
+                              id="tooltip4434120802"
+                              onClick={(e) => this.onClickRejeter(row._id)}
                               size="sm"
                               color="danger"
-                             // to={`/admin/assign-product/${row._id}`}
-                              tag={Link}
                             >
                               <span className="btn-inner--icon mr-1">
                                 <i className="ni ni-single-copy-04" />
@@ -266,5 +273,7 @@ export default connect(
   (state) => ({
   }),
   {
+    validerEtat,
+    rejeterEtat
   }
 )(ManagePublish);
