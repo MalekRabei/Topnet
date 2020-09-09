@@ -6,7 +6,9 @@ import {
   getClient,
   createClient,
   editClient,
-  getProductsByCountryCode
+  getProductsByCountryCode,
+  getAllContacts
+
 } from "../../../services/clientServices/clientActions";
 import { clearErrors } from "../../../services/errorServices/errorAction";
 
@@ -52,6 +54,7 @@ import { uploadImage } from "../../../services/ImageServices/ImageActions";
 import ImageUpload from "../user/adding-user/ImageUpload";
 import Fonction from "../../../utils/fonction.json";
 import Adresse from "../../../utils/adresse.json";
+import ModalAddContact from "./contact/ModalAddContact";
 
 
 const Options = [
@@ -85,18 +88,18 @@ class EditClient extends React.Component {
       raisonSociale: "",
 
       nombreSite: "",
-      multisite: false,
-      showNbSite:false,
+      multisite: true,
+      showNbSite:true,
       groupe: false,
       dateDebut: "",
       effectif: "",
       secteurActivite: "",
       matriculeFiscale: "",
-      tva: false ,
-      showTva: false,
+      tva: true,
+      showTva: true,
       tvaFile: "",
-      timbre: false  ,  
-      showTimbre:false,
+      timbre: true  ,  
+      showTimbre:true,
       timbreFile:"",
 
       logo: "",
@@ -104,6 +107,7 @@ class EditClient extends React.Component {
       rue2: "" ,
       ville : "",
       gouvernorat: "",
+      gouvernoratSelected: "",
       gouvernoratS:"",
       localite: "",
       localiteS:"",
@@ -138,6 +142,12 @@ class EditClient extends React.Component {
       selectedOption: false,
       result: false,
       client: {},
+      contact: [],
+      contacts:[],
+      contact1:{},
+      contact2:{},
+      contact3:{},
+      contact4:{},
 
     };
     this.onChange = this.onChange.bind(this);
@@ -161,6 +171,7 @@ class EditClient extends React.Component {
 
   async componentWillMount() {
 
+    this.props.getAllContacts();
     this.fetchUsers();
     
     //get country codes
@@ -221,10 +232,10 @@ class EditClient extends React.Component {
         label: ad.codePostal
       })
     })
-    this.setState({codePostalS: CodePostalData })
+    await this.setState({codePostalS: CodePostalData })
     console.log(codePostalS);
 
-    await this.props.getClient(this.state.id).then((response) => {
+     this.props.getClient(this.state.id).then((response) => {
       this.setState({
        chargeCompte: response.payload.chargeCompte,
         profil: response.payload.profil,
@@ -245,11 +256,11 @@ class EditClient extends React.Component {
         timbre: response.payload.timbre,
         timbreFile: response.payload.timbreFile,
         logo: response.payload.logo,
-
+        contact: response.payload.contact,
          rue1: response.payload.rue1,
          rue2: response.payload.rue2,
          ville : response.payload.ville,
-         gouvernerat: response.payload.gouvernerat,
+         gouvernorat: response.payload.gouvernorat,
          localite:response.payload.localite,
          delegation : response.payload.delegation,
          codePostal: response.payload.codePostal,
@@ -271,6 +282,31 @@ class EditClient extends React.Component {
 
 
   }
+
+
+
+  handleOptionChange(e) {
+    this.setState({
+      selectedOption: e.target.value
+    });
+  }
+  SelectContact1Handler= (selectedOptions)=> {
+    const cont1 = selectedOptions;
+    this.setState({contact1: cont1})
+  }
+  SelectContact2Handler= (selectedOptions)=> {
+    const cont2 = selectedOptions;
+    this.setState({contact2: cont2})
+  }
+  SelectContact3Handler= (selectedOptions)=> {
+    const cont3 = selectedOptions;
+    this.setState({contact3: cont3})
+  }
+  SelectContact4Handler= (selectedOptions)=> {
+    const cont4 = selectedOptions;
+    this.setState({contact4: cont4})
+  }
+
  //user 
  SelectUserHandler= (selectedOptions)=> {
   const user = selectedOptions;
@@ -388,7 +424,7 @@ SelectMultisiteHandler = (selectedOptions) => {
         };
       }
     );
-    this.setState({ profil: mappedclientfonction });
+   // this.setState({ profil: mappedclientfonction });
   }
 
   //gouvernorat
@@ -401,7 +437,7 @@ SelectMultisiteHandler = (selectedOptions) => {
         };
       }
     );
-    this.setState({ gouvernorat: mappedGouv });
+  //  this.setState({ gouvernorat: mappedGouv });
   }
   //delegation
   if (this.state.delegationS) {
@@ -413,7 +449,7 @@ SelectMultisiteHandler = (selectedOptions) => {
         };
       }
     );
-    this.setState({ delegation: mappedDel });
+  //  this.setState({ delegation: mappedDel });
   }
   ///localite
   if (this.state.localiteS) {
@@ -425,7 +461,7 @@ SelectMultisiteHandler = (selectedOptions) => {
         };
       }
     );
-    this.setState({ localite: mappedLoc });
+   // this.setState({ localite: mappedLoc });
   }
   //code postal
   if (this.state.codePostalS) {
@@ -437,7 +473,7 @@ SelectMultisiteHandler = (selectedOptions) => {
         };
       }
     );
-    this.setState({ codePostal: mappedCP });
+   // this.setState({ codePostal: mappedCP });
 }
 
    // in case of invalid inputs => getting errors
@@ -570,13 +606,21 @@ SelectMultisiteHandler = (selectedOptions) => {
         effectif:this.state.effectif,
         secteurActivite: this.state.secteurActivite,
         matriculeFiscale: this.state.matriculeFiscale,
+        registreCommerce: this.state.registreCommerce,
         tva: this.state.tva ,
+        tvaFile: this.state.tvaFile ,
         timbre: this.state.timbre  ,  
+        timbreFile: this.state.timbreFile  , 
         logo:this.state.logo,
         rue1: this.state.rue1 ,
         rue2: this.state.rue2 ,
         ville : this.state.ville,
-        gouvernerat: this.state.gouvernerat,
+        contact:
+        [this.state.contact1,
+          this.state.contact2,
+          this.state.contact3,
+          this.state.contact4] ,
+        gouvernorat: this.state.gouvernorat,
         localite: this.state.localite,
         delegation : this.state.delegation,
         codePostal: this.state.codePostal,
@@ -587,17 +631,16 @@ SelectMultisiteHandler = (selectedOptions) => {
         email1: this.state.email1,
         email2: this.state.email2,
         email3: this.state.email3,
+        chiffreAffaire: this.state.chiffreAffaire,
         nomComplet: this.state.nomComplet,
-      clientName: this.state.clientName,
-      clientState: this.state.clientState,
-      clientLogo: this.state.clientLogo,
+     
        
     };
-    this.props.editClient(this.state.id, clientData, this.props.history);
+    this.props.editClient(this.state.id, clientData);
   }
-  render() {
-    console.log(this.state)
-    console.log(this.getUnique(this.state.gouvernoratS,'label'))
+  render() {  
+    console.log("contacts", this.state.contact.filter((obj)=> obj.label)[0])
+    const contact =  this.state.contact.filter((obj)=> obj.label)[0];
 
     return (
       <>
@@ -794,7 +837,7 @@ SelectMultisiteHandler = (selectedOptions) => {
                               placeholder="Nombre des sites"
                               type="number"
                               name="nombreSite"
-                              value={this.state.codeClient}
+                              value={this.state.nombreSite}
                               onChange={this.onChange}
                             />
                           </InputGroup>
@@ -833,7 +876,7 @@ SelectMultisiteHandler = (selectedOptions) => {
                           </label>
                           <Select
                             value={
-                              Options.filter(
+                              EffectifOptions.filter(
                                 (obj) => obj.value ===this.state.effectif
                               )[0] }
                             name="effectif"
@@ -852,21 +895,14 @@ SelectMultisiteHandler = (selectedOptions) => {
                     </h6>
                     <div className="pl-lg-4"></div>
 
-                    <Button
-                  className="btn-round btn-icon"
-                  href="#pablo"
-                  id="tooltip443412080"
-                  size="bg"
-                  color="default"
-                  to={`/admin/add-client-contact`}
-                  tag={Link}
-                >
-                  
-                  <span className="btn-inner--icon mr-1">
-                    <i className="ni ni-single-copy-04" />
-                  </span>
-                  <span className="btn-inner--text">Ajouter Les Contacts</span>
-                </Button>
+                    <ModalAddContact
+                    className="btn btn-md btn-info btn-round btn-icon"
+                    headerTitle="Ajouter Contact "
+                    buttonTriggerTitle="Ajouter Contact "
+                    client={this.state.client}
+                    server={this.props.server}
+                    socket={this.props.socket}
+                    />
                 <Row>
                   <Col lg="6">
                       <FormGroup>
@@ -877,12 +913,17 @@ SelectMultisiteHandler = (selectedOptions) => {
                           Contact principal
                         </label>
                         <Select
-                          defaultValue={Options[1]}
-                          name="segment"
-                          options={Options}
+                        value={null}
+                          name="contact1"
+                          options={this.props.clients.contacts.map((ct)=> {
+                            return {
+                              value: ct,
+                              label: ct.nom
+                            }
+                          })}
                           className="basic-multi-select"
                           classNamePrefix="select"
-                          onChange={this.SelectInputHandler}
+                          onChange={this.SelectContact1Handler}
                         />
                       </FormGroup>
                     </Col>
@@ -895,12 +936,26 @@ SelectMultisiteHandler = (selectedOptions) => {
                           Contact Technique
                         </label>
                         <Select
-                          defaultValue={Options[1]}
-                          name="sousSegment"
-                          options={Options}
+                          value={
+                            this.props.clients.contacts.map((ct)=> {
+                              return {
+                                value: ct,
+                                label: ct.nom
+                              }
+                            }).filter(
+                              (obj) => obj === this.state.contact[1]
+                            )[0]
+                          }
+                          name="contact2"
+                          options={this.props.clients.contacts.map((ct)=> {
+                            return {
+                              value: ct,
+                              label: ct.nom
+                            }
+                          })}
                           className="basic-multi-select"
                           classNamePrefix="select"
-                          onChange={this.SelectInputHandler}
+                          onChange={this.SelectContact2Handler}
                         />
                       </FormGroup>
                     </Col>
@@ -914,12 +969,26 @@ SelectMultisiteHandler = (selectedOptions) => {
                           Contact Financier
                         </label>
                         <Select
-                          defaultValue={Options[1]}
-                          name="segment"
-                          options={Options}
+                        value={
+                          this.props.clients.contacts.map((ct)=> {
+                            return {
+                              value: ct,
+                              label: ct.nom
+                            }
+                          }).filter(
+                            (obj) => obj.label === this.state.contact3.nom
+                          )[0]
+                        }
+                          name="contact3"
+                          options={this.props.clients.contacts.map((ct)=> {
+                            return {
+                              value: ct,
+                              label: ct.nom
+                            }
+                          })} 
                           className="basic-multi-select"
                           classNamePrefix="select"
-                          onChange={this.SelectInputHandler}
+                          onChange={this.SelectContact3Handler}
                         />
                       </FormGroup>
                     </Col>
@@ -932,12 +1001,26 @@ SelectMultisiteHandler = (selectedOptions) => {
                           Contact Juridique
                         </label>
                         <Select
-                          defaultValue={Options[1]}
-                          name="sousSegment"
-                          options={Options}
+                        value={
+                          this.props.clients.contacts.map((ct)=> {
+                            return {
+                              value: ct,
+                              label: ct.nom
+                            }
+                          }).filter(
+                            (obj) => obj.label === this.state.contact4.nom
+                          )[0]
+                        }
+                          name="contact4"
+                          options={this.props.clients.contacts.map((ct)=> {
+                            return {
+                              value: ct,
+                              label: ct.nom
+                            }
+                          })}
                           className="basic-multi-select"
                           classNamePrefix="select"
-                          onChange={this.SelectInputHandler}
+                          onChange={this.SelectContact4Handler}
                         />
                       </FormGroup>
                     </Col>
@@ -1212,7 +1295,7 @@ SelectMultisiteHandler = (selectedOptions) => {
                            value={
                             this.state.gouvernoratS.filter(
                               (obj) => obj.value ===this.state.gouvernorat
-                            )[0] }
+                            )}
                             name="gouvernorat"
                             options={this.getUnique(this.state.gouvernoratS,'label')}
                             className="basic-multi-select"
@@ -1604,10 +1687,11 @@ SelectMultisiteHandler = (selectedOptions) => {
 
 const mapStateToProps = (state) => ({
   client: state.client,
+  clients: state.clients,
   errors: state.errors,
   products: state.products,
-  countryCodes: state.countryCodes,
-  CountriesData: state.CountriesData,
+  contacts: state.contacts,
+  contact: state.contact,
   permission: state.auth.current_permission,
 });
 export default connect(mapStateToProps, {
@@ -1617,6 +1701,6 @@ export default connect(mapStateToProps, {
   editClient,
   uploadImage,
   getProductById,
-  getProductsByCountryCode,
+  getAllContacts,
   clearErrors
 })(EditClient);

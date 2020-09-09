@@ -6,7 +6,8 @@ import {
   createClient,
   editClient,
   getProductsByCountryCode,
-  getClientByMatricule
+  getClientByMatricule,
+  getAllContacts
   
 } from "../../../services/clientServices/clientActions";
 
@@ -53,6 +54,7 @@ import CountriesData from "../../../utils/CountryData/CountriesData.json";
 import { clearErrors } from "../../../services/errorServices/errorAction";
 import Fonction from "../../../utils/fonction.json"
 import Adresse from "../../../utils/adresse.json"
+import ModalAddContact from "./contact/ModalAddContact";
 
 const Options = [
   { value: true, label: "Oui" },
@@ -139,17 +141,19 @@ class AddClient extends React.Component {
       selectedOption: false,
       result: false,
       client: {},
+      contacts:[],
+      contact1:{},
+      contact2:{},
+      contact3:{},
+      contact4:{},
 
+      contactSelected:"",
       //input for test validation
       validation: {
-        nom :true,
-        prenom:true,  
-        civilite:true,
-        cin:true,  
+        nomComplet :true,
         rue1: true ,
         rue2:true,
-        fonction:true,
-        resident:true,
+
         gouvernorat: true,
         localite: true,
         delegation : true,
@@ -166,9 +170,8 @@ class AddClient extends React.Component {
     this.SelectProductInputHandler = this.SelectProductInputHandler.bind(this);
     this.onClickOui = this.onClickOui.bind(this);
     this.onClickNon = this.onClickNon.bind(this);
-
     this.findClient = this.findClient.bind(this);
-      this.getUnique = this.getUnique.bind(this)
+    this.getUnique = this.getUnique.bind(this);
   }
   // Fetch data from the back-end
   fetchUsers() {
@@ -200,8 +203,17 @@ class AddClient extends React.Component {
 
   }
 
+  setContacts(){
+    this.setState({
+      contacts: [this.state.contact1 , this.state.contact2, this.state.contact3,
+        this.state.contact4]
+    })
+  }
+
   componentWillMount() {
 
+    this.props.getAllContacts();
+    
     this.fetchUsers();
     //get country codes
     const SelectDataForm = [];
@@ -263,13 +275,19 @@ class AddClient extends React.Component {
     })
     this.setState({codePostalS: CodePostalData })
     console.log(codePostalS);
+
+    if(this.state.contact1){
+      this.setContacts();
+    }
   }
 
   //getting data from reducer
   componentWillReceiveProps(nextProps) {
-    if (nextProps.clients) {
+    /*if (nextProps.clients) {
       this.setState({ client: nextProps.clients.client });
-    }
+      this.setState({ contacts: nextProps.clients.contacts });
+
+    }*/
    
     //fonction
     if (this.state.fonction) {
@@ -458,6 +476,24 @@ class AddClient extends React.Component {
     this.setState({userSelected: user})
   }
 
+  SelectContact1Handler= (selectedOptions)=> {
+    const cont1 = selectedOptions;
+    this.setState({contact1: cont1})
+  }
+  SelectContact2Handler= (selectedOptions)=> {
+    const cont2 = selectedOptions;
+    this.setState({contact2: cont2})
+  }
+  SelectContact3Handler= (selectedOptions)=> {
+    const cont3 = selectedOptions;
+    this.setState({contact3: cont3})
+  }
+  SelectContact4Handler= (selectedOptions)=> {
+    const cont4 = selectedOptions;
+    this.setState({contact4: cont4})
+  }
+
+
   //on Change select client state
   SelectClientStateInputHandler = (e) => {
     this.setState({ clientState: e.value });
@@ -481,7 +517,7 @@ class AddClient extends React.Component {
   ImageRegistreUploadRecievedHandler = (img) => {
     this.setState({ imageRegistre: img });
   };
-  ImageMatriculeUploadRecievedHandler = (img) => {
+  ImageMatriculeUplcontacoadRecievedHandler = (img) => {
     this.setState({ imageMatricule: img });
   };
 
@@ -551,6 +587,11 @@ class AddClient extends React.Component {
         profil: this.state.profil,        
         active: true,        
         raisonSociale: this.state.raisonSociale,
+        contact:
+        [this.state.contact1,
+          this.state.contact2,
+          this.state.contact3,
+          this.state.contact4] ,
         nombreSite:this.state.nombreSite,
         multisite: this.state.multisite,
         groupe:this.state.groupe,
@@ -558,12 +599,13 @@ class AddClient extends React.Component {
         effectif:this.state.effectif,
         secteurActivite: this.state.secteurActivite,
         matriculeFiscale: this.state.matriculeFiscale,
+        registreCommerce: this.state.registreCommerce,
         tva: this.state.tva ,
         tvaFile: this.state.tvaFile ,
 
         timbre: this.state.timbre  ,  
         timbreFile: this.state.timbreFile  ,  
-
+        chiffreAffaire: this.state.chiffreAffaire,
         logo:this.state.logo,
         rue1: this.state.rue1 ,
         rue2: this.state.rue2 ,
@@ -587,6 +629,7 @@ class AddClient extends React.Component {
   render() {
     console.log(this.state)
 console.log(this.getUnique(this.state.gouvernoratS,'label'))
+console.log(this.props)
     return (
       <>
         {/********************  NOTIFICATION DIV  *********************/}
@@ -1003,22 +1046,16 @@ console.log(this.getUnique(this.state.gouvernoratS,'label'))
                     Contacts
                     </h6>
                     <div className="pl-lg-4"></div>
-
-                    <Button
-                  className="btn-round btn-icon"
-                  href="#pablo"
-                  id="tooltip443412080"
-                  size="bg"
-                  color="default"
-                  to={`/admin/add-client-contact`}
-                  tag={Link}
-                >
-                  
-                  <span className="btn-inner--icon mr-1">
-                    <i className="ni ni-single-copy-04" />
-                  </span>
-                  <span className="btn-inner--text">Ajouter Les Contacts</span>
-                </Button>
+                    <ModalAddContact
+                    className="btn btn-md btn-info btn-round btn-icon"
+                    headerTitle="Ajouter Contact "
+                    buttonTriggerTitle="Ajouter Contact "
+                    client={this.state.client}
+                    server={this.props.server}
+                    socket={this.props.socket}
+                    />
+                   
+     
                 <Row>
                   <Col lg="6">
                       <FormGroup>
@@ -1029,12 +1066,16 @@ console.log(this.getUnique(this.state.gouvernoratS,'label'))
                           Contact principal
                         </label>
                         <Select
-                          defaultValue={Options[1]}
-                          name="segment"
-                          options={Options}
+                          name= "contact1"
+                           options={this.props.clients.contacts.map((ct)=> {
+                            return {
+                              value: ct,
+                              label: ct.nom
+                            }
+                          })}
                           className="basic-multi-select"
                           classNamePrefix="select"
-                          onChange={this.SelectInputHandler}
+                          onChange={this.SelectContact1Handler}
                         />
                       </FormGroup>
                     </Col>
@@ -1047,12 +1088,16 @@ console.log(this.getUnique(this.state.gouvernoratS,'label'))
                           Contact Technique
                         </label>
                         <Select
-                          defaultValue={Options[1]}
-                          name="sousSegment"
-                          options={Options}
+                          name="contact2"
+                          options={this.props.clients.contacts.map((ct)=> {
+                            return {
+                              value: ct,
+                              label: ct.nom
+                            }
+                          })}
                           className="basic-multi-select"
                           classNamePrefix="select"
-                          onChange={this.SelectInputHandler}
+                          onChange={this.SelectContact2Handler}
                         />
                       </FormGroup>
                     </Col>
@@ -1066,12 +1111,16 @@ console.log(this.getUnique(this.state.gouvernoratS,'label'))
                           Contact Financier
                         </label>
                         <Select
-                          defaultValue={Options[1]}
-                          name="segment"
-                          options={Options}
+                          name="contact3"
+                          options={this.props.clients.contacts.map((ct)=> {
+                            return {
+                              value: ct,
+                              label: ct.nom
+                            }
+                          })}
                           className="basic-multi-select"
                           classNamePrefix="select"
-                          onChange={this.SelectInputHandler}
+                          onChange={this.SelectContact3Handler}
                         />
                       </FormGroup>
                     </Col>
@@ -1083,13 +1132,17 @@ console.log(this.getUnique(this.state.gouvernoratS,'label'))
                         >
                           Contact Juridique
                         </label>
-                        <Select
-                          defaultValue={Options[1]}
-                          name="sousSegment"
-                          options={Options}
+                      <Select
+                          name="contact4"
+                          options={this.props.clients.contacts.map((ct)=> {
+                            return {
+                              value: ct,
+                              label: ct.nom
+                            }
+                          })}
                           className="basic-multi-select"
                           classNamePrefix="select"
-                          onChange={this.SelectInputHandler}
+                          onChange={this.SelectContact4Handler}
                         />
                       </FormGroup>
                     </Col>
@@ -1736,13 +1789,15 @@ const mapStateToProps = (state) => ({
   countryCodes: state.countryCodes,
   CountriesData: state.CountriesData,
   clients: state.clients,
+  contacts: state.contacts,
+  contact: state.contact,
   users: state.users,
   permission: state.auth.current_permission,
 });
 export default connect(mapStateToProps, {
   createClient,
   editClient,
-  getAllProducts,
+  getAllContacts,
   uploadImage,
   clearErrors,
   getProductsByCountryCode,
