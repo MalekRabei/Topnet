@@ -2659,7 +2659,7 @@ render() {
                 </Row>
                  
                 <Row> 
-                 <Col  class="float-left">  <h5> matricule fiscale             : </h5>  </Col > 
+                 <Col  class="float-left">  <h5> Matricule fiscale             : </h5>  </Col > 
                  <Col class="float-left">   {props.matriculeFiscale}    </Col > 
                 </Row>
                 <Row> 
