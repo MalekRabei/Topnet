@@ -173,10 +173,10 @@ let clients = this.props.clients;
             className="dataTables_filter px-4 pb-1"
           >
             <label>
-              Search:
+              Recherche :
               <SearchBar
                 className="form-control-sm"
-                placeholder=""
+                placeholder="Recherche"
                 {...props.searchProps}
               />
             </label>

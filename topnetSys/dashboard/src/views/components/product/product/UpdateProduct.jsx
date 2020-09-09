@@ -61,7 +61,7 @@ class UpdateProduct extends React.Component {
     };
   }
   componentWillMount() {
-    this.props.getProductById(this.state.id);
+    this.props.getProductById(this.state.id.id);
     //Insert Selector Data
     const SelectDataForm = [];
     const CountryData = [...CountriesData];
@@ -176,6 +176,7 @@ class UpdateProduct extends React.Component {
     this.setState({ productImg: img });
   };
   render() {
+    console.log(this.state)
     return (
       <>
         {/********************  NOTIFICATION DIV  *********************/}

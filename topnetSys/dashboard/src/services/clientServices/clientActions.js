@@ -143,7 +143,7 @@ export const createContact = (contactData, history) => dispatch => {
 //get all contact
 export const getAllContacts = () => (dispatch) => {
   axios
-    .get("/api/contact/list")
+    .get('/api/contact/list')
     .then((res) =>
       dispatch({
         type: GET_ALL_CONTACTS,

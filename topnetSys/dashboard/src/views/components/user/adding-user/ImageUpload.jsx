@@ -40,7 +40,7 @@ class ImageUpload extends Component {
       });
     }
 
-    if (nextprops.imgSrc && this.state.Img === null) {
+    if (nextprops.imgSrc ) {
       console.log("nextprops.image", nextprops.image, "file", this.state);
       this.setState({
         imgSrc: process.env.PUBLIC_URL + "/Images/" + nextprops.image,

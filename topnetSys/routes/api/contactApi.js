@@ -10,14 +10,12 @@ const Contact = require("../../models/Contact");
 // @access  Private
 router.get("/list", (req, res) => {
   Contact.find({})
-    .then((result) => {
-      res.json(result);
-    })
-    .catch((err) => {
-      res
-        .status(404)
-        .json({ success: false, msg: `Something went wrong. ${err}` });
-    });
+  .then((data) => {
+    res.status(202).json(data);
+  })
+  .catch((error) => {
+    res.status(500).send(error);
+  });
 });
 
 

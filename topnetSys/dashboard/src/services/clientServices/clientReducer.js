@@ -94,16 +94,19 @@ import {
           ...state,
           message:action.payload.msg,
         };
+
         case GET_ALL_CONTACTS:
         return {
           ...state,
-          contacts : action.payload,
-          message:action.payload.msg,
+          contacts:action.payload,
+          //loading: false,
+
         };
+
         case DELETE_CONTACT:
-      return {
-        ...state,
-      };
+        return {
+          ...state,
+        };
       default:
         return state;
     }

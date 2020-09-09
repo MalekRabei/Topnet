@@ -137,7 +137,7 @@ class Users extends Component {
           <Card className="bg-gradient-success">
             <CardBody>
               <CardTitle className="text-white" tag="h3">
-                Online users in this page
+               Utilisateurs en ligne
               </CardTitle>
               <blockquote className="blockquote text-white mb-0">
                 <p>
@@ -152,7 +152,7 @@ class Users extends Component {
               to="/admin/add-user"
               className="btn btn-outline-primary mr-1 float-right"
             >
-              Add New User
+              Ajouter utilisateur
             </Link>
             <TableUser
               onUserUpdated={this.handleUserUpdated}

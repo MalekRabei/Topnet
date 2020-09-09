@@ -68,14 +68,7 @@ this.setState({users:users});
           <Table.Cell>{user.name}</Table.Cell>
           <Table.Cell>{user.email}</Table.Cell>
           <Table.Cell>{user.role}</Table.Cell>
-          <Table.Cell>
-            {user.adresse.map((obj, index) => (
-              <React.Fragment key={index}>
-                <Label>{obj.label}</Label>
-                <br />{" "}
-              </React.Fragment>
-            ))}
-          </Table.Cell>
+
           <Table.Cell>
             {user.enabled == true ? (
               <i className="fas fa-check text-success fa-1x" />
@@ -96,9 +89,9 @@ this.setState({users:users});
           <Table.Cell>
             <Col>
               <ModalUser
-                headerTitle="Edit User"
-                buttonTriggerTitle="Edit"
-                buttonSubmitTitle="Save"
+                headerTitle="Modifier utilisateur"
+                buttonTriggerTitle="Modifier"
+                buttonSubmitTitle="Modifier"
                 buttonColor="blue"
                 userid={user._id}
                 onUserUpdated={this.props.onUserUpdated}
@@ -110,8 +103,8 @@ this.setState({users:users});
              
 
               <ModalConfirmDelete
-                headerTitle="Delete User"
-                buttonTriggerTitle="Delete"
+                headerTitle="Supprimer Utilisateur"
+                buttonTriggerTitle="Supprimer"
                 buttonColor="red"
                 user={user}
                 onUserDeleted={this.props.onUserDeleted}
@@ -119,8 +112,8 @@ this.setState({users:users});
                 socket={this.props.socket}
               />
                <ShowImageModal
-                headerTitle="Show Image"
-                buttonTriggerTitle="Show"
+                headerTitle="Afficher Avatar"
+                buttonTriggerTitle="Afficher"
                 buttonColor="pink"
                 user={user}
                 server={this.props.server}
@@ -151,13 +144,12 @@ this.setState({users:users});
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>avatar</Table.HeaderCell>
-            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell>Nom</Table.HeaderCell>
             <Table.HeaderCell>Email</Table.HeaderCell>
-            <Table.HeaderCell>Role</Table.HeaderCell>
-            <Table.HeaderCell>Address</Table.HeaderCell>
-            <Table.HeaderCell>Enabled</Table.HeaderCell>
+            <Table.HeaderCell>Rôle</Table.HeaderCell>
+            <Table.HeaderCell>Etat</Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
-            <Table.HeaderCell></Table.HeaderCell>
+            <Table.HeaderCell>Activer</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>{usersTabData}</Table.Body>
