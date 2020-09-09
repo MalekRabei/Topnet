@@ -21,6 +21,9 @@ router.get("/list", (req, res) => {
           .json({ success: false, msg: `Something went wrong. ${err}` });
       });
   });
+// @route   POST api/abonnements/abonnement
+// @desc    add cliabonnementent
+// @access  Private
 router.post(
     "/abonnement/add", async(req, res, next) => {
    // if (req.body.clientId && req.body.productId) {
@@ -174,4 +177,7 @@ else {
     });
 }
 })
+
+
+
 module.exports = router;

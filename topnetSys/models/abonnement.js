@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const abonnementSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    clientId :  { type: mongoose.Schema.Types.ObjectId, ref : 'client',required:false},
+    //clientId :  { type: mongoose.Schema.Types.ObjectId, ref : 'client',required:false},
+    clientId :  { type: String , ref : 'client',required:false},
     productId : { type: mongoose.Schema.Types.ObjectId, ref : 'product',required:false},
     debit:      { type: String, required: false },
     fichier1recto: { type: String, required: false },

@@ -28,6 +28,7 @@ export const createAbonnement = (abonnementData, history) => dispatch => {
         type: GET_ERRORS,
         payload: err.response.data,
       })
+      
     );
 };
 

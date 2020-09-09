@@ -3,11 +3,13 @@ import { connect } from "react-redux";
 import axios from "axios";
 import io from "socket.io-client";
 import ReactDatetime from "react-datetime";
+import Popup from 'react-popup';
 // Action Redux
 import {
     getClient,
     createClient,
     editClient,
+    getClientByMatricule
   } from "../../../services/clientServices/clientActions";
   import {
     createAbonnement,
@@ -100,35 +102,30 @@ const segOptions = [
         this.server = process.env.REACT_APP_API_URL || "";
         this.socket = io.connect(this.server);
         this.state = {
-         
-          fichier1recto:"",
-          fichier1verso:"",
-          fichier2recto:"",
-          fichier2verso:"",
-          fichier3recto:"",
-          fichier3verso:"",
-
-          fichier1rectoimg:{},
-          fichier1versoimg:{},
-          fichier2rectoimg:{},
-          fichier2versoimg:{},
-          fichier3rectoimg:{},
-          fichier3versoimg:{},
-          debit:"",
-          telADSL:"",
-          modePaiement:"",
-          active:{},
+            fichier1recto:"",
+            fichier1verso:"",
+            fichier2recto:"",
+            fichier2verso:"",
+            fichier3recto:"",
+            fichier3verso:"",
+            fichier1rectoimg:{},
+            fichier1versoimg:{},
+            fichier2rectoimg:{},
+            fichier2versoimg:{},
+            fichier3rectoimg:{},
+            fichier3versoimg:{},
+            debit:"",
+            telADSL:"",
+            modePaiement:"",
+            active:{},
           /**     forfait */
-
-
+            forfait:"",
+            prix: "",
             openedCollapses: ["collapseAds"],
-            openedCollapses: ["collapseProds"],
-           
+            openedCollapses: ["collapseProds"],     
             clientPIds: [],
-
             clientCountryCode: [],
             clientCountryCodeSelected: [],
-            
             CountriesData: [],
             errors: {},
             clientAdss: [],
@@ -178,7 +175,7 @@ nomComplet: "",
 products: [],
 productIdsSelected: [],
 fonction:"",
-
+idc:"",
 image: {},
 
 errors: {},
@@ -205,7 +202,13 @@ abonnement:{}
     this.findClient = this.findClient.bind(this);
     this.SelectInputHandler= this.SelectInputHandler.bind(this)
     this.handleSubmit= this.handleSubmit.bind(this)
-    //this.ImageUploadRecievedHandler1a=this.ImageUploadRecievedHandler1a.bind(this)
+    this.ImageUploadRecievedHandler1a=this.ImageUploadRecievedHandler1a.bind(this)
+    this.ImageUploadRecievedHandler1b=this.ImageUploadRecievedHandler1b.bind(this)
+    this.ImageUploadRecievedHandler2a=this.ImageUploadRecievedHandler2a.bind(this)
+    this.ImageUploadRecievedHandler2b=this.ImageUploadRecievedHandler2b.bind(this)
+    this.ImageUploadRecievedHandler3a=this.ImageUploadRecievedHandler3a.bind(this)
+    this.ImageUploadRecievedHandler3b=this.ImageUploadRecievedHandler3b.bind(this)
+    this.ImageUploadRecievedHandler=this.ImageUploadRecievedHandler.bind(this)
 
     
 
@@ -307,52 +310,6 @@ componentWillMount() {
   
 
 
-  /*this.props.getClient(this.state.id).then((response) =>
-    this.setState({
-    chargeCompte: response.payload.chargeCompte,
-    profil: response.payload.profil,
-    active: response.payload.active,
-    raisonSociale: response.payload.raisonSociale,
-    nombreSite: response.payload.nombreSite,
-    multisite: response.payload.multisite,
-    groupe: response.payload.groupe,
-    dateDebut: response.payload.dateDebut,
-    effectif: response.payload.effectif,
-
-    secteurActivite: response.payload.secteurActivite,
-    matriculeFiscale: response.payload.matriculeFiscale,
-    registreCommerce : response.payload.registreCommerce,
-    chiffreAffaire : response.payload.chiffreAffaire,
-    tva: response.payload.tva,
-    timbre: response.payload.timbre,
-    logo: response.payload.logo,
-
-     rue1: response.payload.rue1,
-     rue2: response.payload.rue2,
-     ville : response.payload.ville,
-     gouvernerat: response.payload.gouvernerat,
-     localite:response.payload.localite,
-     delegation : response.payload.delegation,
-     codePostal: response.payload.codePostal,
-     pays : response.payload.pays,
-     tel : response.payload.tel,
-     gsm: response.payload.gsm,
-     fax: response.payload.fax,
-     emailTopnet: response.payload.emailTopnet,
-     email1: response.payload.email1,
-     email2: response.payload.email2,
-     email3: response.payload.email3,
-     nomComplet: response.payload.nomComplet,
-     contact: response.payload.contact,
-    
-    clientPIds: response.payload.products.map((obj, index) => 
-    {return {
-      value : obj,
-      label : obj.title
-    }} ),
-  })
-);*/
-
 //get product from db
 this.props.getAllProducts();
 
@@ -378,6 +335,9 @@ componentWillReceiveProps(nextProps) {
   if (nextProps.errors) {
     this.setState({ errors: nextProps.errors });
   }
+  if (nextProps.clients) {
+    this.setState({ client: nextProps.clients.client });
+  }
   if (nextProps.client) {
     const client = nextProps.client;
     // console.log( nextProps.client.client);
@@ -387,10 +347,25 @@ componentWillReceiveProps(nextProps) {
       products: client.products,
     });
   }
+  
+ 
+  //fonction
+  if (this.state.fonction) {
+    const mappedclientfonction = this.state.fonction.map(
+      (fct) => {
+        return {
+          value: fct.value,
+          label: fct.label,
+        };
+      }
+    );
+    this.setState({ profil: mappedclientfonction });
+  }
+
 
 
   if (nextProps.abonnement) {
-    const abonnement = nextProps.abonnement;
+    this.setState({ abonnement: nextProps.abonnement });
   }
 
   //assign product
@@ -519,7 +494,9 @@ onSubmit(e) {
       nomComplet: this.state.nomComplet,
       
   };
-  this.props.createClient(clientData, this.props.history);
+  this.props.createClient(clientData, this.props.history)
+  
+  
 }
 /********************************************************************* */
 
@@ -570,21 +547,64 @@ SelectProductInputHandler = (selectedOptions) => {
         formData.append("img", this.fichier1rectoimg);
         this.props.uploadImage(formData, path_to_upload);
       }
+      if (this.state.fichier1versoimg.name !== undefined) {
+
+        let path_to_upload = "abonnement"; // $ /
+        let imageName = this.state.fichier1versoimg.name.toLowerCase().split(" ").join("-");
+        this.state.fichier1verso =
+          path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+        const formData = new FormData();
+  
+        formData.append("img", this.fichier1versoimg);
+        this.props.uploadImage(formData, path_to_upload);
+      }
+      if (this.state.fichier2rectoimg.name !== undefined) {
+
+        let path_to_upload = "abonnement"; // $ /
+        let imageName = this.state.fichier2rectoimg.name.toLowerCase().split(" ").join("-");
+        this.state.fichier2recto =
+          path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+        const formData = new FormData();
+  
+        formData.append("img", this.fichier2rectoimg);
+        this.props.uploadImage(formData, path_to_upload);
+      }
       if (this.state.fichier2versoimg.name !== undefined) {
 
         let path_to_upload = "abonnement"; // $ /
         let imageName = this.state.fichier2versoimg.name.toLowerCase().split(" ").join("-");
-        this.state.fichier2recto =
+        this.state.fichier2verso =
           path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
         const formData = new FormData();
   
         formData.append("img", this.fichier2versoimg);
         this.props.uploadImage(formData, path_to_upload);
       }
+      if (this.state.fichier3rectoimg.name !== undefined) {
 
-
-
+        let path_to_upload = "abonnement"; // $ /
+        let imageName = this.state.fichier3rectoimg.name.toLowerCase().split(" ").join("-");
+        this.state.fichier3recto =
+          path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+        const formData = new FormData();
   
+        formData.append("img", this.fichier3rectoimg);
+        this.props.uploadImage(formData, path_to_upload);
+      }
+      if (this.state.fichier3versoimg.name !== undefined) {
+
+        let path_to_upload = "abonnement"; // $ /
+        let imageName = this.state.fichier3versoimg.name.toLowerCase().split(" ").join("-");
+        this.state.fichier3verso =
+          path_to_upload.toLowerCase().split("$").join("/") + "/" + imageName;
+        const formData = new FormData();
+  
+        formData.append("img", this.fichier3versoimg);
+        this.props.uploadImage(formData, path_to_upload);
+      }
+
+
+
       const clientData = {
           
           chargeCompte: this.state.chargeCompte,
@@ -618,48 +638,51 @@ SelectProductInputHandler = (selectedOptions) => {
           nomComplet: this.state.nomComplet,
           
       };
-      this.props.createClient(clientData, this.props.history);
 
-      
+      this.props.createClient(clientData, this.props.history)
+      console.log("2 -    this.state"+this.state.data)
     
-
-
+   
+     this.props.getClientByMatricule(clientData.matriculeFiscale)
+     
+     console.log("3 -   this.state"+this.state.matriculeFiscale)
      //// parite produit
-    const products= this.state.clientProductIdsSelected.map((product) => {
+     const products= this.state.clientProductIdsSelected.map((product) => {
       return product.value;
     })
      alert("Your registration detail:"+products.length+products[0]._id)
 
-
+this.state.forfait=products[0]._id
+this.state.prix="150 DT"
 
      /////////////// parite abonnement
      
      const abonnementData = {
           
-      clientId: this.state.client._id,
+      clientId: clientData.matriculeFiscale,
       productId: products[0]._id,        
       debit: this.state.debit,        
       fichier1recto: this.state.fichier1recto,
-      fichier1verso:this.state.fichier1verso,
+      fichier1verso: this.state.fichier1verso,
       fichier2recto: this.state.fichier2recto,
-      fichier2verso:this.state.fichier2verso,
+      fichier2verso: this.state.fichier2verso,
       fichier3recto: this.state.fichier3recto,
       fichier3verso: this.state.fichier3verso,
-      modePaiement: this.state.modePaiement,
-      telADSL : this.state.telADSL  ,
+      modePaiement:  this.state.modePaiement,
+      telADSL :      this.state.telADSL,
       etat : false
 
       
   };
-  console.log(this.state.matriculeFiscale+"/"+abonnementData.productId +"/"+this.state.debit+"/"+this.state.fichier1recto+"/"+this.state.fichier1verso+"/")
+ /// console.log(this.state.clients.client._id+"/"+this.state.matriculeFiscale+"/"+this.state.clients[0].client._id +"/"+this.state.debit+"/"+this.state.fichier1recto+"/"+this.state.fichier1verso+"/")
  
-this.props.createAbonnement(abonnementData, this.props.history);
+      this.props.createAbonnement(abonnementData, this.props.history);
 
     }
     
     _next = () => {
       let currentStep = this.state.currentStep
-      currentStep = currentStep >= 2? 3: currentStep + 1
+      currentStep = currentStep >= 3? 4: currentStep + 1
       this.setState({
         currentStep: currentStep
       })
@@ -692,7 +715,7 @@ this.props.createAbonnement(abonnementData, this.props.history);
   
   nextButton(){
     let currentStep = this.state.currentStep;
-    if(currentStep <3){
+    if(currentStep <4){
       return (
         <button 
           className="btn btn-primary float-right" 
@@ -706,6 +729,7 @@ this.props.createAbonnement(abonnementData, this.props.history);
       
 render() {    
       return (
+
         <React.Fragment>
 
         <SimpleHeader name="abonnement" parentName="Clients" />
@@ -733,13 +757,15 @@ render() {
                       </h6>
                       <h4>    Step {this.state.currentStep} </h4> 
                       <div className="pl-lg-4">
+
                     
   <form onSubmit={this.handleSubmit}>
         {/* 
           render the form steps and pass required props in
          
         */}
-         
+
+
       <Step1 
             currentStep={this.state.currentStep} 
             fetchUsers={this.fetchUsers}
@@ -751,7 +777,10 @@ render() {
             SelectInputHandler={this.SelectInputHandler}
             SelectUserHandler={this.SelectUserHandler}
             handleChange={this.handleChange}
+            ImageUploadRecievedHandler={this.ImageUploadRecievedHandler}
+
             //////////////////////
+           
             show={this.state.show}
             search={this.state.search}
             hide={this.state.hide}
@@ -829,6 +858,7 @@ render() {
             currentStep={this.state.currentStep} 
             debit={this.state.debit}
             handleChange={this.handleChange}
+            onChange={this.onChange}
             openedCollapses={this.state.openedCollapses}
             onSubmit2={this.state.onSubmit2}
             SelectProductInputHandler={this.SelectProductInputHandler}
@@ -861,7 +891,30 @@ render() {
             modePaiement={this.modePaiement}
             currentStep={this.state.currentStep} 
             handleChange={this.handleChange}
+            onChange={this.onChange}
             handleSubmit={this.handleSubmit}
+            ImageUploadRecievedHandler1a={this.ImageUploadRecievedHandler1a}
+            ImageUploadRecievedHandler1b={this.ImageUploadRecievedHandler1b}
+            ImageUploadRecievedHandler2a={this.ImageUploadRecievedHandler2a}
+            ImageUploadRecievedHandler2b={this.ImageUploadRecievedHandler2b}
+            ImageUploadRecievedHandler3a={this.ImageUploadRecievedHandler3a}
+            ImageUploadRecievedHandler3b={this.ImageUploadRecievedHandler3b}
+
+          />
+
+<Step4
+           
+            currentStep={this.state.currentStep} 
+           
+            handleSubmit={this.handleSubmit}
+            nomComplet={this.state.nomComplet}
+            matriculeFiscale={this.state.matriculeFiscale}
+            forfait={this.state.forfait}
+            debit={this.state.debit}
+            prix={this.state.prix}
+
+
+        
           />
          
           {this.previousButton()}
@@ -906,6 +959,7 @@ render() {
       <center>
       <br/>
       <br/>
+      <br/><br/><br/>
               <Col lg="5">
               <Card className="bg-secondary shadow border-0">
                   <CardHeader className="bg-white pb-5">
@@ -929,8 +983,7 @@ render() {
       <br/><br/>
       <br/><br/>
       <br/><br/>
-      <br/><br/>
-      <br/><br/>
+      
       </center>
                : 
            null
@@ -2308,6 +2361,85 @@ render() {
       </React.Fragment>
     );
   }
+
+
+
+
+
+
+  function Step4(props) {
+    if (props.currentStep !== 4) {
+      return null
+    } 
+    return(
+      <React.Fragment>
+     
+      <br/>
+      <br/>
+      <br/>
+        <Container className="mt--6" fluid>
+
+    
+      
+    <Card>
+        <CardBody>
+       
+
+
+       
+  
+                    <div className="pl-lg-4">
+                    <h6 className="heading-small text-muted mb-4">
+                    Confirmation de l'abonnement 
+                    </h6>
+                    <div className="pl-lg-4">
+                    
+                    </div>
+
+                  
+                  <div className="pl-lg-4">
+                  {props.nomComplet} {" "}
+                  </div>
+                  <div className="pl-lg-4">
+                  {props.matriculeFiscale} {" "}
+                  </div>
+                  <div className="pl-lg-4">
+                  {props.forfait} {" "}
+                  </div>
+                  <div className="pl-lg-4">
+                  {props.debit} {" "}
+                  </div>
+                  <div className="pl-lg-4">
+                  {props.modePaiement} {" "}
+                  </div>
+                  <div className="pl-lg-4">
+                  {props.prix} {" "}
+                  </div>
+
+
+
+                
+        <input value="Confirmer"type="button" className="mt-4" color="primary"  onClick={props.handleSubmit}/>
+    </div>
+  
+ </CardBody>
+ </Card>
+ 
+
+<br/>
+<br/>
+
+ 
+
+<br/>
+<br/>
+
+
+        </Container>
+      
+      </React.Fragment>
+    );
+  }
   
 Abonnement.propTypes = {
     createClient: PropTypes.func.isRequired,
@@ -2315,6 +2447,9 @@ Abonnement.propTypes = {
     editClient: PropTypes.func.isRequired,
     errors: PropTypes.object.isRequired,
     getClient: PropTypes.func.isRequired,
+    getClientByMatricule: PropTypes.func.isRequired,
+    client:  PropTypes.object.isRequired,
+    clients:  PropTypes.object.isRequired,
   };
   const mapStateToProps = (state) => ({
     client: state.client,
@@ -2330,11 +2465,14 @@ Abonnement.propTypes = {
     createClient,
     editClient,
     getClient,
+    getClientByMatricule,
     getAllProducts,
     getProductById,
     createAbonnement,
     uploadImage,
     clearErrors,
     getProductById,
+    
+
     
   })(Abonnement);

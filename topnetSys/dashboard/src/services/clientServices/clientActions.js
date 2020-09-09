@@ -35,6 +35,7 @@ export const createClient = (clientData, history) => dispatch => {
         payload: err.response.data,
       })
     );
+   
 };
 
 
@@ -61,6 +62,7 @@ export const getClientByMatricule = matricule => dispatch => {
   return  axios
     .get(`/api/clients/findClientByMatricule/${matricule}`)
     .then(res => {
+      console.log(".then and res ="+res.data)
       dispatch({
         type: GET_CLIENTM,
         payload: res.data

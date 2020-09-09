@@ -1593,6 +1593,7 @@ console.log(this.state)
 // };
 
 const mapStateToProps = (state) => ({
+  
   client: state.client,
   errors: state.errors,
   products: state.products,

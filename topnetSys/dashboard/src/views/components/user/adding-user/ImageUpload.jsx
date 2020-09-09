@@ -6,7 +6,7 @@ class ImageUpload extends Component {
     console.log("constructor ", this.props);
     this.state = {
       Img: null,
-      imgSrc: null,
+      imgSrc: 1,
     };
     this.onFileChange = this.onFileChange.bind(this);
   }
@@ -79,7 +79,7 @@ class ImageUpload extends Component {
         <br></br>
         <div className="form-group">
           <label
-            htmlFor="Imgupload"
+            htmlFor={this.state.imgSrc}
             className={
               "btn " +
               (labelText === "Select image"
@@ -93,7 +93,7 @@ class ImageUpload extends Component {
 
           <input
             ref="file"
-            id="Imgupload"
+            id={this.state.imgSrc}
             style={{ display: "none" }}
             type="file"
             name="Imgupload"

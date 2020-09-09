@@ -191,10 +191,11 @@ router.delete("/client/delete/:id", function (req, res, next) {
 
 router.get("/findClientByMatricule/:matricule", async (req,res,next)=>{
 
-  await Client.findOne({matriculeFiscale: req.params.matriculeFiscale})
+  await Client.findOne({matriculeFiscale: req.params.matricule})
   .then((data)=>{
     console.log("client by mail", data);
-    res.status(202).json(data);
+    res.json(data);
+    //res.status(202).json(data);
   })
  .catch((error)=>{
       res.status(500).send(error);
