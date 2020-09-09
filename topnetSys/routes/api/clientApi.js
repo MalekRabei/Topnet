@@ -23,7 +23,16 @@ router.get("/list", (req, res) => {
 // @route   POST api/clients/client
 // @desc    add client
 // @access  Private
-router.post("/client/add", (req, res) => {
+router.post("/client/add", 
+ [
+  check("chargeCompte", "Chargé de compe est obligatoire").isLength({ min: 1 }),
+  check("raisonSociale", "Raison Sociale est obligatoire").isLength({ min: 1 }),
+  check("matriculeFiscale", "Matricule Fiscale obligatoire").isLength({ min: 1 }),
+  check("profil", "Profil est obligatoire").isLength({ min: 1 }),
+  check("tel", "Telephone est obligatoire").isLength({ min: 1 }),
+
+]
+,(req, res) => {
     //Check errors in  the body
     const errors = validationResult(req);
     //Bad Request
@@ -49,10 +58,15 @@ router.post("/client/add", (req, res) => {
 
         secteurActivite: req.body.secteurActivite,
         matriculeFiscale: req.body.matriculeFiscale,
+
         registreCommerce : req.body.registreCommerce,
+
         chiffreAffaire : req.body.chiffreAffaire,
         tva: req.body.tva,
+        tvaFile: req.body.tvaFile,
+
         timbre: req.body.timbre,
+        timbreFile: req.body.timbreFile,
         logo: req.body.logo,
 
          rue1: req.body.rue1,
@@ -130,6 +144,7 @@ router.put("/client/edit/:id", async (req, res) => {
       profil: req.body.profil,
       active: req.body.active,
       raisonSociale: req.body.raisonSociale,
+    
       nombreSite: req.body.nombreSite,
       multisite: req.body.multisite,
       groupe: req.body.groupe,
@@ -137,11 +152,20 @@ router.put("/client/edit/:id", async (req, res) => {
       effectif: req.body.effectif,
 
       secteurActivite: req.body.secteurActivite,
+
       matriculeFiscale: req.body.matriculeFiscale,
+      matriculeFiscaleFile: req.body.matriculeFiscaleFile,
+
       registreCommerce : req.body.registreCommerce,
+      registreCommerceFile : req.body.registreCommerceFile,
+
       chiffreAffaire : req.body.chiffreAffaire,
       tva: req.body.tva,
+      tvaFile: req.body.tvaFile,
+
       timbre: req.body.timbre,
+      timbreFile: req.body.timbreFile,
+
       logo: req.body.logo,
 
        rue1: req.body.rue1,
@@ -191,11 +215,10 @@ router.delete("/client/delete/:id", function (req, res, next) {
 
 router.get("/findClientByMatricule/:matricule", async (req,res,next)=>{
 
-  await Client.findOne({matriculeFiscale: req.params.matricule})
+  await Client.findOne({matriculeFiscale: req.params.matriculeFiscale})
   .then((data)=>{
     console.log("client by mail", data);
-    res.json(data);
-    //res.status(202).json(data);
+    res.status(202).json(data);
   })
  .catch((error)=>{
       res.status(500).send(error);

@@ -1,0 +1,18 @@
+export const GET_ERRORS = 'GET_ERRORS';
+export const CLEAR_ERRORS = 'CLEAR_ERRORS';
+
+/**  CLIENT TYPES  */
+export const ADD_CLIENT ="ADD_CLIENT" ;
+export const CLIENT_LOADING = "CLIENT_LOADING";
+export const GET_CLIENT = "GET_CLIENT";
+export const GET_CLIENTM = "GET_CLIENTM";
+export const GET_ALL_CLIENTS = "GET_ALL_CLIENTS";
+export const UPDATING_CLIENT = "UPDATING_CLIENT";
+export const CLEAR_MESSAGE = "CLEAR_MESSAGE";
+export const GET_PRODUCTS_BY_COUNTRYCODE = "GET_PRODUCTS_BY_COUNTRYCODE";
+export const ADD_CONTACT ="ADD_CONTACT" ;
+export const GET_ALL_CONTACTS = "GET_ALL_CLIENTS";
+export const DELETE_CONTACT = "DELETE_CONTACT";
+
+
+

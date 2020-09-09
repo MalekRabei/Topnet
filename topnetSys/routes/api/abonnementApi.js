@@ -3,9 +3,14 @@ var router = express.Router();
 const mongoose = require("mongoose");
 const fs = require("fs");
 const { validationResult , check} = require("express-validator");
+const auth = require("../../middleware/auth");
+
 
 
 const Abonnement = require("../../models/abonnement");
+const User = require("../../models/User");
+const abonnement = require("../../models/abonnement");
+
 
 // @route   POST api/abonnement/list
 // @desc    get all abonnements
@@ -21,9 +26,6 @@ router.get("/list", (req, res) => {
           .json({ success: false, msg: `Something went wrong. ${err}` });
       });
   });
-// @route   POST api/abonnements/abonnement
-// @desc    add cliabonnementent
-// @access  Private
 router.post(
     "/abonnement/add", async(req, res, next) => {
    // if (req.body.clientId && req.body.productId) {
@@ -180,4 +182,66 @@ else {
 
 
 
+/******************************Gestion Etat */
+router.get('/listedattente',(req, res) => {
+    Abonnement.find({"etat":false})
+      .then((result) => {
+        res.json(result);
+      })
+      .catch((err) => {
+        res
+          .status(404)
+          .json({ success: false, msg: `Something went wrong. ${err}` });
+      });
+} );
+
+router.post('/valider/:id',auth,async (req, res) => {
+    try {
+        var user = await User.findById(req.user.id).select("-password");
+        var abonnement = await Abonnement.findOneAndUpdate({_id: req.params.id},
+            {
+                $set: {
+                    etat : true,
+                    user : user,
+                }
+            }).then((data)=>{
+                console.log("abonnement rejeté", data)
+                res.end(JSON.stringify({ data }, null, 5));  
+
+            }).catch((error) => {
+                res.status(500).send(error);
+              });
+
+     }catch(err) {
+        console.error(err.message);
+        res.status(500).send("server error"); }
+     });
+
+
+router.post('/rejeter/:id',auth,async (req, res) => {
+
+        try {
+            var user = await User.findById(req.user.id).select("-password");
+            var abonnement = await Abonnement.findOneAndUpdate({_id: req.params.id},
+                {
+                    $set: {
+                        etat : false,
+                        user : user,
+                        motif : req.body.motif,
+                    }
+                }).then((data)=>{
+                    console.log("abonnement rejeté", data)
+                    res.end(JSON.stringify({ data }, null, 5));  
+
+                }).catch((error) => {
+                    res.status(500).send(error);
+                  });
+      
+    
+            }catch(err) {
+            console.error(err.message);
+            res.status(500).send("server error"); }
+    });
+
+            
 module.exports = router;
